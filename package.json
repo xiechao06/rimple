@@ -1,0 +1,19 @@
+{
+  "name": "ripple-js",
+  "version": "0.0.1",
+  "description": "A fully reactive frontend library",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiechao06/ripple-js.git"
+  },
+  "author": "xiechao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xiechao06/ripple-js/issues"
+  },
+  "homepage": "https://github.com/xiechao06/ripple-js#readme"
+}
