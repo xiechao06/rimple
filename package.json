@@ -1,19 +1,34 @@
 {
-  "name": "ripple-js",
-  "version": "0.0.1",
-  "description": "A fully reactive frontend library",
+  "name": "slot",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-minify": "^0.2.0",
+    "babel-preset-env": "^1.6.1",
+    "co-mocha": "^1.2.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-better-rollup": "^2.0.0",
+    "gulp-changed": "^2.0.0",
+    "gulp-environments": "^0.1.2",
+    "gulp-mocha": "^4.3.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^2.6.1",
+    "mocha-clean": "^1.0.0",
+    "ramda": "^0.23.0",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-babel-minify": "^3.1.2",
+    "should": "^11.2.1",
+    "should-spies": "^1.1.0",
+    "source-map-support": "^0.4.18",
+    "yargs": "^7.1.0"
+  },
   "scripts": {
-    "test": "npm test"
+    "test": "./node_modules/gulp/bin/gulp.js test"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xiechao06/ripple-js.git"
-  },
-  "author": "xiechao",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/xiechao06/ripple-js/issues"
-  },
-  "homepage": "https://github.com/xiechao06/ripple-js#readme"
+  "author": "",
+  "license": "ISC"
 }
