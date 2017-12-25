@@ -68,7 +68,7 @@ const Slot = function Slot(...args) {
 
 Slot.prototype.isTopmost = function isTopmost() {
   return !this._parents.length;
-}
+};
 
 
 // var Slot = function (initial, tag, mutatedTester) {
@@ -98,7 +98,7 @@ Slot.prototype.tag = function tag(v) {
 Slot.prototype.mutatedTester = function mutatedTester(tester) {
   this._mutatedTester = tester;
   return this;
-}
+};
 
 Slot.prototype.isRoot = function () {
   return this.parents.length == 0;
@@ -106,9 +106,9 @@ Slot.prototype.isRoot = function () {
 
 Slot.prototype.hasChildren = function (id) {
   if (id == void 0) {
-    return _objectValues(this_childMap).length > 0;
+    return _objectValues(this._childMap).length > 0;
   }
-  return !!this_childMap[id];
+  return !!this._childMap[id];
 };
 
 /* *
@@ -204,7 +204,7 @@ Slot.prototype.replaceParent = function replaceParent(idx, parent) {
 
 Slot.prototype.removeParent = function removeParent(idx) {
   return this.replaceParent(idx);
-}
+};
 
 Slot.prototype.offChange = function (proc) {
   this._onChangeCbs = this._onChangeCbs.filter(cb => cb != proc);

@@ -67,7 +67,7 @@ describe('watch', function () {
     $$s2.val().should.eql(4);
 
     let spy = should.spy();
-    let $$s3 = $$(spy, [$$s1]).tag('s3');
+    $$(spy, [$$s1]).tag('s3');
     $$s1.val(3);
     spy.should.be.calledWith([3], {
       roots: [$$s1],
@@ -88,7 +88,7 @@ describe('watch', function () {
 
     let $$s4 = $$(function ([s2, s3]) {
       return s2 + s3;
-    }, [$$s2, $$s3]).tag('s4')
+    }, [$$s2, $$s3]).tag('s4');
 
     $$s4.val().should.eql(7);
 
@@ -96,7 +96,7 @@ describe('watch', function () {
     $$s4.val().should.eql(9);
 
     let spy = should.spy();
-    let $$s5 = $$(spy, [$$s2, $$s3]).tag('s5');
+    $$(spy, [$$s2, $$s3]).tag('s5');
     $$s1.touch();
     spy.should.be.calledWith([4, 5], {
       roots: [$$s1],
@@ -104,7 +104,7 @@ describe('watch', function () {
     });
 
   });
-})
+});
 
 
 // it('connect4', function () {
@@ -537,7 +537,7 @@ describe('batch update', function () {
       involvedParents.map(it => it.tag()).should.deepEqual(['p1']);
       return p1 + p2;
     }, [$$p1, $$p2]).tag('c1');
-    let $$c2 = $$(function ([p2], { roots }) {
+    let $$c2 = $$(function ([p2]) {
       return p2 * 2;
     }, [$$p2]).tag('c2');
     let spy = should.spy();

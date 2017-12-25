@@ -7,35 +7,6 @@ const babel = require('rollup-plugin-babel');
 const minify = require('rollup-plugin-babel-minify');
 const { production } = require('gulp-environments');
 
-// const builder = function builder(doUglify) {
-//   return function () {
-//     return gulp.src('index.js')
-//     .pipe(sourcemaps.init())
-//     .pipe(rollup({
-//       plugins: [
-//         babel({
-//           presets: [['env', {
-//             modules: false,
-//             browsers: ['ie8']
-//           }]],
-//           plugins: [
-//             'external-helpers',
-//             'transform-es2015-for-of'
-//           ],
-//         }),
-//         ...(doUglify? [uglify()]: [])
-//       ]
-//     }, {
-//       dest: doUglify? 'slot.min.js': 'slot.js',
-//       format: 'umd',
-//       moduleId: '$$',
-//       moduleName: '$$'
-//     }))
-//     .pipe(sourcemaps.write('./'))
-//     .pipe(gulp.dest('./dist'));
-//   };
-// };
-
 gulp.task('build', function () {
   return gulp.src('index.js')
   .pipe(sourcemaps.init())
