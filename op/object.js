@@ -1,7 +1,7 @@
 export default {
   patch(obj) {
     this.debug && console.info(
-      `slot: slot ${this.tag} is about to be patched`, obj
+      `slot: slot ${this.tag()} is about to be patched`, obj
     );
     this.val(Object.assign(this.val(), obj));
     return this;

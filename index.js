@@ -485,13 +485,14 @@ Slot.prototype.shrink = function (val) {
 
 const updateBy = function (slotFnPairs) {
   return update(slotFnPairs.map(function ([slot, fn]) {
-    return [slot, fn && fn.apply(slot, [slot.value])];
+    return [slot, fn && fn.apply(slot, [slot.val()])];
   }));
 };
 
 const update = function (slotValuePairs) {
   let cleanSlots = {};
   let roots = slotValuePairs.map(([slot]) => slot);
+  // update the targets directly
   slotValuePairs.forEach(function ([slot, value]) {
     slot.debug && console.info(`slot ${slot._tag} mutatedTester`, slot._value, value);
     let oldValue = slot._value;
@@ -530,7 +531,7 @@ const update = function (slotValuePairs) {
     });
   });
   // group _offspringMap by level, but omits level 0 (those updated directly)
-  // since they should not be touched
+  // since they have been touched
   let slots;
   let levels = [];
   let currentLevel = 0;

@@ -2,6 +2,7 @@ const should = require('should');
 require('should-spies');
 const $$ = require('./dist/ripple.js');
 const assert = require('assert');
+const R = require('ramda');
 
 describe('single one', function () {
   it('simple', function () {
@@ -532,22 +533,24 @@ describe('batch update', function () {
     let $$p1 = $$(1).tag('p1');
     // $$p2 is always clean
     let $$p2 = $$(2).tag('p2').mutatedTester(() => false);
-    let $$c1 = $$(function ([p1, p2], { roots, involvedParents }) {
+    let spy1 = should.spy(function ([p1, p2], { roots, involvedParents }) {
       roots.map(it => it.tag()).should.deepEqual(['p1', 'p2']);
       involvedParents.map(it => it.tag()).should.deepEqual(['p1']);
       return p1 + p2;
-    }, [$$p1, $$p2]).tag('c1');
+    });
+    let $$c1 = $$(spy1, [$$p1, $$p2]).tag('c1');
     let $$c2 = $$(function ([p2]) {
       return p2 * 2;
     }, [$$p2]).tag('c2');
-    let spy = should.spy();
-    $$c2.change(spy);
+    let spy2 = should.spy();
+    $$c2.change(spy2);
 
     $$.update([
       [$$p1, 2],
       [$$p2, 4],
     ]);
-    spy.should.not.be.called();
+    spy1.should.be.called();
+    spy2.should.not.be.called();
     $$c1.val().should.eql(6);
     $$c2.val().should.eql(8);
   });
@@ -562,43 +565,19 @@ it('shrink', function () {
   $$s2.val().should.equal(-1);
 });
 
-// describe('update', function () {
-//   it('abcd', function () {
-//     let $$p1 = $$(1).tag('p1');
-//     let $$p2 = $$(2).tag('p2');
-//     let $$c1 = $$(function ([p1], { roots, involvedParents }) {
-//       roots.map(it => it.tag()).should.deepEqual(['p1', 'p2']);
-//       involvedParents.map(it => it.tag()).should.deepEqual(['p1']);
-//       return p1 * 2;
-//     }, [$$p1]).tag('c1');
-//     let $$c2 = $$(function ([p2], { roots, involvedParents }) {
-//       roots.map(it => it.tag()).should.deepEqual(['p1', 'p2']);
-//       involvedParents.map(it => it.tag()).should.deepEqual(['p2']);
-//       return p2 * 2;
-//     }, [$$p2]).tag('c2');
-//     $$.update([
-//       [$$p1, 2],
-//       [$$p2, 4],
-//     ]);
-//     $$c1.val().should.eql(4);
-//     $$c2.val().should.eql(8);
-//   });
+it('updateBy', function () {
+  let $$p1 = $$(1).tag('p1');
+  let $$p2 = $$(2).tag('p2');
+  let $$c = $$(function ([p1, p2]) {
+    return p1 + p2;
+  }, [$$p1, $$p2]).tag('c');
+  $$.updateBy([
+    [$$p1, R.add(1)],
+    [$$p2, R.add(2)],
+  ]);
 
-// });
-
-// it('updateBy', function () {
-//   let $$p1 = $$(1, 'p1');
-//   let $$p2 = $$(2, 'p2');
-//   let $$c = $$.connect([$$p1, $$p2], function ([p1, p2]) {
-//     return p1 + p2;
-//   }).tag('c');
-//   $$.updateBy([
-//     [$$p1, R.add(1)],
-//     [$$p2, R.add(2)],
-//   ]);
-
-//   $$c.val().should.eql(6);
-// });
+  $$c.val().should.eql(6);
+});
 
 it('make child', function () {
   let $$parent = $$(1).tag('parent');
