@@ -1,0 +1,42 @@
+Arguments: 
+  /home/xc/local/bin/node /usr/share/yarn/bin/yarn.js
+
+PATH: 
+  /home/xc/local/bin:/home/xc/.npm-packages/bin:/home/xc/local/bin:/home/xc/.npm-packages/bin:/home/xc/local/bin:/home/xc/.npm-packages/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/xc/.local/dotfiles/.cache/fzf/bin
+
+Yarn version: 
+  1.3.2
+
+Node version: 
+  6.8.1
+
+Platform: 
+  linux x64
+
+npm manifest: 
+  {
+    "name": "crud",
+    "version": "1.0.0",
+    "description": "",
+    "main": "gulpfile.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "gulp": "^3.9.1",
+      "gulp-connect": "^5.0.0",
+      "portfinder": "^1.0.13"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: ENOENT: no such file or directory, open '/home/xc/workspace/ripple-js/samples/crud/node_modules/braces/node_modules/is-accessor-descriptor/LICENSE'
+      at Error (native)

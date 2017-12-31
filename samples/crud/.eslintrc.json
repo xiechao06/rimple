@@ -1,0 +1,8 @@
+{
+    "globals": {
+        "$$": true,
+        "Navigo": true,
+        "R": true,
+        "chance": true
+    }
+}

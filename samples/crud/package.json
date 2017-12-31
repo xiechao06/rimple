@@ -1,0 +1,30 @@
+{
+  "name": "crud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-better-rollup": "^2.0.0",
+    "gulp-connect": "^5.0.0",
+    "gulp-sourcemaps": "^2.6.2",
+    "portfinder": "^1.0.13",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-resolve": "^3.0.0"
+  },
+  "dependencies": {
+    "chance": "^1.0.13",
+    "country-list": "^1.1.0",
+    "navigo": "^6.0.1",
+    "normalize.css": "^7.0.0",
+    "query-string": "^5.0.1",
+    "ramda": "^0.25.0",
+    "virtual-dom": "^2.1.1"
+  }
+}
