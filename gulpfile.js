@@ -6,17 +6,12 @@ const sourcemaps = require('gulp-sourcemaps');
 const babel = require('rollup-plugin-babel');
 const minify = require('rollup-plugin-babel-minify');
 const { production } = require('gulp-environments');
-const jsdoc = require('gulp-jsdoc3');
+const { exec } = require('child_process');
 
 gulp.task('doc', function (cb) {
-  gulp.src(['README.md', 'index.js', 'op/*.js'], {
-    read: false,
-    opts: {
-      destination: './docs',
-    },
-    plugins: ['plugins/markdown'],
-  })
-  .pipe(jsdoc(cb));
+  exec('node_modules/jsdoc/jsdoc.js README.js index.js op/*.js -c ./.jsdoc.json -d docs', () => {
+    cb();
+  });
 });
 
 gulp.task('build', function () {
