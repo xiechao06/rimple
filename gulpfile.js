@@ -11,6 +11,9 @@ const jsdoc = require('gulp-jsdoc3');
 gulp.task('doc', function (cb) {
   gulp.src(['README.md', 'index.js', 'op/*.js'], {
     read: false,
+    opts: {
+      destination: './docs',
+    },
     plugins: ['plugins/markdown'],
   })
   .pipe(jsdoc(cb));
