@@ -1,6 +1,6 @@
 # ripple-js
 
-https://xiechao06.github.io/ripple-js.
+[ripple-js](https://xiechao06.github.io/ripple-js).
 
 A deadly simple reactive frontend library.
 
