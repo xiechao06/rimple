@@ -1,15 +1,30 @@
+/**
+ * these are a group of operations to mutate a slot with value type of boolean
+ *
+ * @lends Slot.prototype
+ *
+ * */
 export default {
+  /**
+   * toggle the Slot's value
+   * @return {Slot} this
+   * */
   toggle() {
-    this.val(!this.val());
-    return this;
+    return this.val(!this.val());
   },
+  /**
+   * make the Slot's value to be true
+   * @return {Slot} this
+   * */
   on() {
-    this.val(true);
-    return this;
+    return this.val(true);
   },
+  /**
+   * make the Slot's value to be false
+   * @return {Slot} this
+   * */
   off() {
-    this.val(false);
-    return this;
+    return this.val(false);
   }
 };
 

@@ -6,6 +6,15 @@ const sourcemaps = require('gulp-sourcemaps');
 const babel = require('rollup-plugin-babel');
 const minify = require('rollup-plugin-babel-minify');
 const { production } = require('gulp-environments');
+const jsdoc = require('gulp-jsdoc3');
+
+gulp.task('doc', function (cb) {
+  gulp.src(['README.md', 'index.js', 'op/*.js'], {
+    read: false,
+    plugins: ['plugins/markdown'],
+  })
+  .pipe(jsdoc(cb));
+});
 
 gulp.task('build', function () {
   return gulp.src('index.js')
@@ -51,6 +60,10 @@ gulp.task('test', ['build'], function () {
 
 gulp.task('watch', function () {
   gulp.watch(['index.js', 'test.js', 'op/*.js'], ['test']);
+});
+
+gulp.task('watch-doc', function () {
+  gulp.watch(['index.js', 'op/*.js'], ['doc']);
 });
 
 gulp.task('default', ['test', 'watch']);

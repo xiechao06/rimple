@@ -1121,18 +1121,11 @@ var userStore = {
 const router = new Navigo(null);
 
 'use strict';
-var _1_1_0_strictUriEncode = function (str) {
+var strictUriEncode = function (str) {
 	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
 		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
 	});
 };
-
-
-
-var _1_1_0_strictUriEncode$2 = Object.freeze({
-	default: _1_1_0_strictUriEncode,
-	__moduleExports: _1_1_0_strictUriEncode
-});
 
 /*
 object-assign
@@ -1198,7 +1191,7 @@ function shouldUseNative() {
 	}
 }
 
-var _4_1_1_objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
+var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
 	var from;
 	var to = toObject(target);
 	var symbols;
@@ -1224,13 +1217,6 @@ var _4_1_1_objectAssign = shouldUseNative() ? Object.assign : function (target, 
 
 	return to;
 };
-
-
-
-var _4_1_1_objectAssign$2 = Object.freeze({
-	default: _4_1_1_objectAssign,
-	__moduleExports: _4_1_1_objectAssign
-});
 
 'use strict';
 var token = '%[a-f0-9]{2}';
@@ -1311,7 +1297,7 @@ function customDecodeURIComponent(input) {
 	return input;
 }
 
-var _0_2_0_decodeUriComponent = function (encodedURI) {
+var decodeUriComponent = function (encodedURI) {
 	if (typeof encodedURI !== 'string') {
 		throw new TypeError('Expected `encodedURI` to be of type `string`, got `' + typeof encodedURI + '`');
 	}
@@ -1326,19 +1312,6 @@ var _0_2_0_decodeUriComponent = function (encodedURI) {
 		return customDecodeURIComponent(encodedURI);
 	}
 };
-
-
-
-var _0_2_0_decodeUriComponent$2 = Object.freeze({
-	default: _0_2_0_decodeUriComponent,
-	__moduleExports: _0_2_0_decodeUriComponent
-});
-
-var strictUriEncode = ( _1_1_0_strictUriEncode$2 && _1_1_0_strictUriEncode ) || _1_1_0_strictUriEncode$2;
-
-var objectAssign = ( _4_1_1_objectAssign$2 && _4_1_1_objectAssign ) || _4_1_1_objectAssign$2;
-
-var decodeComponent = ( _0_2_0_decodeUriComponent$2 && _0_2_0_decodeUriComponent ) || _0_2_0_decodeUriComponent$2;
 
 'use strict';
 
@@ -1491,9 +1464,9 @@ var parse = function (str, opts) {
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeComponent(val);
+		val = val === undefined ? null : decodeUriComponent(val);
 
-		formatter(decodeComponent(key), val, ret);
+		formatter(decodeUriComponent(key), val, ret);
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {
@@ -1551,7 +1524,7 @@ var stringify = function (obj, opts) {
 	}).join('&') : '';
 };
 
-var _5_0_1_queryString = {
+var queryString = {
 	extract: extract,
 	parse: parse,
 	stringify: stringify
@@ -1615,7 +1588,7 @@ var listApp = {
     .tag('list-view');
   },
   onMount() {
-    let { page=1, pageSize=16 } = _5_0_1_queryString.parse(location.search);
+    let { page=1, pageSize=16 } = queryString.parse(location.search);
     $$loading.val('.loading');
     userStore.fetchList({ page, pageSize })
     .then(function ({ totalCnt, data }) {

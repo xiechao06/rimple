@@ -23,7 +23,7 @@ const $$username = $$({
 
 $$username.debug = true;
 
-const $$inputs = $$username.makeChild(function ({ firstName, lastName }) {
+const $$inputs = $$username.fork(function ({ firstName, lastName }) {
   return h('.inputs', [
     h('input', {
       placeholder: 'input your first name',
@@ -42,7 +42,7 @@ const $$inputs = $$username.makeChild(function ({ firstName, lastName }) {
   ]);
 });
 
-const $$yourNameEl = $$username.makeChild(function ({ firstName, lastName }) {
+const $$yourNameEl = $$username.fork(function ({ firstName, lastName }) {
   return h('h2', [
     'your name is: ',
     h('span.fullname', {

@@ -2,7 +2,6 @@ import booleanOps from './op/boolean';
 import objectOps from './op/object';
 import numberOps from './op/number';
 import listOps from './op/list';
-import stringOps from './op/string';
 
 const _uniqueId = function _uniqueId() {
   let i = 1;
@@ -32,14 +31,82 @@ const _objectValues = function _objectValues(obj) {
   return values;
 };
 
+/**
+ * @constructor
+ *
+ * @desc A Slot could be created in 2 methods:
+ *
+ *  * new Slot(value)
+ *
+ *  this will make a data slot
+ *
+ *  * new Slot(valueFunc, followings)
+ *
+ *  this will make a follower slot, where followings is an Array.
+ *  if the element (say *following*) in observables is a:
+ *
+ *    * Slot
+ *
+ *      if *following* changed, *follower* will be re-evaludated by executing *valueFunc*,
+ *      following.val() will be used as valueFunc's argument.
+ *      its new value is the return value of *valueFunc*, and change will be propogated to
+ *      *follower*'s followers.
+ *
+ *    * not Slot
+ *
+ *      when *follower* is re-evaluated, following will be used as *valueFunc*'s argument directly.
+ *
+ *  and valueFunc will accept 2 parameters:
+ *
+ *    * the current value of observables
+ *    * mutation process context, it has two keys:
+ *
+ *      * roots - the mutation process roots, namely, those changed by clients (api caller)
+ *        directly
+ *
+ *      * involved - the observed involed in this mutation process
+ *
+ *      the context is very useful if the evaluation function needs to return value
+ *      according to which of its followings mutated
+ *
+ *  let's see two example:
+ *
+ *  ```javascript
+ *
+ *  const $$following = $$(1);
+ *  const $$follower = $$((following, n) => following + n, [$$following, 2]);
+ *  console.log($$follower.val()); // output 3, since n is always 2
+ *
+ *  $$following.inc();
+ *  console.log($$follower.val()); // output 4, since n is always 2
+ *  ```
+ *
+ *  ```javascript
+ *
+ *  const $$a = $$(1).tag('a');
+ *  const $$b = $$(([a]) => a + 1, [$$a]).tag('b');
+ *  const $$c = $$(2).tag('c');
+ *  const $$d = $$(function ([a, b], {roots, involved}) {
+ *    console.log(roots.map(it => it.tag())); // output [a]
+ *    console.log(involved.map(it => it.tag())); // output [b]
+ *    return a + b;
+ *  });
+ *
+ *  // a is root of mutation proccess, and c is not changed in this mutation proccess
+ *  $$a.inc();
+ *
+ *  ```
+ *
+ * */
 const Slot = function Slot(...args) {
   if (!(this instanceof Slot)) {
     return new Slot(...args);
   }
   this._id = _uniqueId();
-  this._onChangeCbs = [];
-  this._parents = [];
-  this._childMap = {};
+  this._changeCbs = [];
+  this._followings = [];
+  this._followerMap = {};
+  // offsprings are all direct or indirect followers
   this._offspringMap = {};
   this._offspringLevels = [];
   this._tag = '';
@@ -48,45 +115,44 @@ const Slot = function Slot(...args) {
       return this._tag + '-' + this._id;
     }
   });
-  Object.defineProperty(this, 'parents', {
+  Object.defineProperty(this, 'followings', {
     get: function get() {
-      return this._parents;
+      return this._followings;
     }
   });
-  Object.defineProperty(this, 'children', {
+  Object.defineProperty(this, 'followers', {
     get: function get() {
-      return _objectValues(this._childMaps);
+      return _objectValues(this._followerMaps);
     }
   });
   if (args.length <= 1) {
     this._value = args[0];
   } else {
-    const [valueFunc, parents, eager] = args;
-    this.watch(valueFunc, parents, eager);
+    const [valueFunc, followings, eager] = args;
+    this.follow(valueFunc, followings, eager);
   }
 };
 
+/**
+ * test if slot observes others
+ * @return {boolean} true if it observes others, else false
+ * */
 Slot.prototype.isTopmost = function isTopmost() {
-  return !this._parents.length;
+  return !this._followings.length;
 };
 
-
-// var Slot = function (initial, tag, mutatedTester) {
-//   if (!(this instanceof Slot)) {
-//     return new Slot();
-//   }
-//   this.id = _uniqueId();
-//   this.value = initial;
-//   this._onChangeCbs = [];
-//   this.parents = [];
-//   this_childMap = {};
-//   this._offspringMap = {};
-//   this._offspringLevels = [];
-//   this._tag = tag;
-//   this.token = this.tag + '-' + this.id;
-//   this.mutatedTester = mutatedTester;
-// };
-
+/**
+ * Set/get tag of slot, useful when debugging.
+ *
+ * @example
+ * // set tag will return this
+ * const $$s = $$('foo').tag('bar');
+ * console.log($$s.tag()); // output bar
+ *
+ * @param {(string|undefined)} v - if is string, set the tag of slot and return this,
+ * else return the tag
+ * @return {(string|Slot)}
+ * */
 Slot.prototype.tag = function tag(v) {
   if (v == void 0) {
     return this._tag;
@@ -95,61 +161,110 @@ Slot.prototype.tag = function tag(v) {
   return this;
 };
 
-Slot.prototype.mutatedTester = function mutatedTester(tester) {
-  this._mutatedTester = tester;
+/**
+ * set a handler to Slot to test if slot is mutated, here is an example:
+ *
+ * @example
+ * let $$s1 = $$(true);
+ * let $$s2 = $$(false);
+ *
+ * let $$s3 = $$((s1, s2) => s1 && s2, [$$s1, $$s2])
+ * .mutationTester((oldV, newV) => oldV != newV);
+ *
+ * $$s4 = $$s3.makeFollower((s3) => !s3)
+ * .change(function () {
+ *    console.log('s4 changed!');
+ * });
+ *
+ * // $$s2 will be changed to true, but $$s3 is not changed,
+ * // neither $$s4 will be changed
+ * $$s2.toggle();
+ *
+ *
+ * @param {function} tester - a handler to test if slot is changed in one mutation
+ * process, if a slot finds all its dependents are unmutation, the mutation process
+ * stops from it.
+ * A propriate tester will improve the performance dramatically sometimes.
+ *
+ * it access slot as *this* and slot's new value and old value as arguments,
+ * and return true if slot is changed in mutation process, else false.
+ *
+ * */
+Slot.prototype.mutationTester = function mutationTester(tester) {
+  this._mutationTester = tester;
   return this;
 };
 
-Slot.prototype.isRoot = function () {
-  return this.parents.length == 0;
-};
-
-Slot.prototype.hasChildren = function (id) {
-  if (id == void 0) {
-    return _objectValues(this._childMap).length > 0;
-  }
-  return !!this._childMap[id];
-};
-
-/* *
- * add a change hanlder
+/**
+ * add a change handler
  *
  * !!!Warning, this is a very dangerous operation if you modify slots in
  * change handler, consider the following scenario:
  *
+ * ```javascript
  *  let $$s1 = $$(1);
- *  let $$s2 = $$s1.makeChild(it => it * 2);
- *  let $$s3 = $$s1.makeChild(it => it * 3);
- *  let $$s4 = $$();
+ *  let $$s2 = $$s1.makeFollower(it => it * 2);
+ *  let $$s3 = $$s1.makeFollower(it => it * 3);
  *  $$s2.change(function () {
  *    $$s1.val(3); // forever loop
  *  ));
  *
  *  $$s1.val(2);
+ * ```
  *
- *  as a thumb of rule, don't set value for parents in change handler
+ *
+ *  as a thumb of rule, don't set value for followings in change handler
+ *
+ * @param {function} proc - it will be invoked when slot is mutated in one
+ * mutation process the same order as it is added, it accepts the following
+ * parameters:
+ *
+ *   * new value of Slot
+ *   * the old value of Slot
+ *   * the mutation context
+ *
+ * for example, you could refresh the UI, when ever the final view changed
+ *
+ * @return {Slot} this
  *
  * */
 Slot.prototype.change = function (proc) {
-  this._onChangeCbs.push(proc);
+  this._changeCbs.push(proc);
   return this;
 };
 
 /**
- * detach the target slot from its parents, and let its children
- * connect me, just as slot has been eliminated
- * note! I won't respond with target slot's parents' change
+ * remove the change handler
+ *
+ * @see {@link Slot#change}
  * */
-Slot.prototype.override = function override(slot) {
-  for (let parent of slot._parents) {
-    delete parent._childMap[slot._id];
+Slot.prototype.offChange = function (proc) {
+  this._changeCbs = this._changeCbs.filter(cb => cb != proc);
+};
+
+
+/**
+ * detach the target slot from its followings, and let its followers
+ * connect me(this), just as if slot has been eliminated after the detachment.
+ * this method is very useful if you want to change the dependent graph
+ *
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param {Slot} targetSlot
+ * @return {Slot} this
+ *
+ * */
+Slot.prototype.override = function override(targetSlot) {
+  for (let following of targetSlot._followings) {
+    delete following._followerMap[targetSlot._id];
   }
-  for (let childId in slot._childMap) {
-    let child = slot._childMap[childId];
-    this._childMap[childId] = child;
-    for (let i = 0; i < child._parents.length; ++i) {
-      if (child._parents[i]._id == slot._id) {
-        child._parents[i] = this;
+  for (let followerId in targetSlot._followerMap) {
+    let follower = targetSlot._followerMap[followerId];
+    this._followerMap[followerId] = follower;
+    for (let i = 0; i < follower._followings.length; ++i) {
+      if (follower._followings[i]._id == targetSlot._id) {
+        follower._followings[i] = this;
         break;
       }
     }
@@ -157,10 +272,10 @@ Slot.prototype.override = function override(slot) {
   this._offspringMap = this._offspringLevels = void 0;
   // make ancestors _offspringMap obsolete, why not just calculate _offspringMap
   // for each ancestor? since this operation should be as quick as possible
-  // and multiple override/replaceParent/connect operations could be batched,
+  // and multiple override/replaceFollowing/connect operations could be batched,
   // since the calculation of springs of ancestors postponed to the moment
   // when ancestor is evaluated
-  slot.getAncestors().forEach(function (ancestor) {
+  targetSlot._getAncestors().forEach(function (ancestor) {
     ancestor._offspringLevels = ancestor._offspringMap = void 0;
   });
   return this;
@@ -168,57 +283,66 @@ Slot.prototype.override = function override(slot) {
 
 
 /**
- * replaceParent, why not just re-connect, since connect is a quite
- * expensive operation, whilst replaceParent only affect the replaced one
+ * replaceFollowing, why not just re-follow, since follow is a quite
+ * expensive operation, while replaceFollowing only affect the replaced one
  *
- * @param idx the index of parent
- * @param parent a slot or any object, if not provided, the "idx"th parent will
- * be unconnected
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param idx the index of following
+ * @param following a slot or any object, if not provided, the "idx"th following will
+ * not be followed anymore.
+ *
+ * @return {Slot} this
  */
-Slot.prototype.replaceParent = function replaceParent(idx, parent) {
+Slot.prototype.replaceFollowing = function replaceFollowing(idx, following) {
   let args = [idx, 1];
-  if (parent != void 0) {
-    args.push(parent);
+  if (following != void 0) {
+    args.push(following);
   }
-  let [replaced] = this.parents.splice.apply(this.parents, args);
-  // replace the same parent, just return
-  if (replaced == parent) {
+  let [replaced] = this.followings.splice.apply(this.followings, args);
+  // replace the same following, just return
+  if (replaced == following) {
     return this;
   }
   if (replaced instanceof Slot) {
-    delete replaced._childMap[this.id];
+    delete replaced._followerMap[this.id];
     replaced._offspringLevels = replaced._offspringMap = void 0;
-    replaced.getAncestors().forEach(function (ancestor) {
+    replaced._getAncestors().forEach(function (ancestor) {
       ancestor._offspringLevels = ancestor._offspringMap = void 0;
     });
   }
-  if (parent instanceof Slot) {
-    parent._offspringLevels = parent._offspringMap = void 0;
+  if (following instanceof Slot) {
+    following._offspringLevels = following._offspringMap = void 0;
     // make ancestors _offspringMap obsolete
-    parent.getAncestors().forEach(function (ancestor) {
+    following._getAncestors().forEach(function (ancestor) {
       ancestor._offspringLevels = ancestor._offspringMap = void 0;
     });
   }
   return this;
 };
 
-Slot.prototype.removeParent = function removeParent(idx) {
-  return this.replaceParent(idx);
-};
-
-Slot.prototype.offChange = function (proc) {
-  this._onChangeCbs = this._onChangeCbs.filter(cb => cb != proc);
+/**
+ * this is the shortcut of replaceFollowing(idx)
+ *
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param {number} idx - the index of
+ * */
+Slot.prototype.removeFollowing = function removeFollowing(idx) {
+  return this.replaceFollowing(idx);
 };
 
 // propogate from me
 Slot.prototype._propogate = function ({ roots }) {
-  // if has only one child, touch it
-  let children = _objectValues(this._childMap);
-  if (children.length == 0) {
+  // if has only one follower, touch it
+  let followers = _objectValues(this._followerMap);
+  if (followers.length == 0) {
     return;
   }
-  if (children.length == 1) {
-    children[0].touch(true, { roots, involvedParents: [this] });
+  if (followers.length == 1) {
+    followers[0].touch(true, { roots, involved: [this] });
     return;
   }
   if (this._offspringLevels === void 0 || this._offspringMap === void 0) {
@@ -230,43 +354,49 @@ Slot.prototype._propogate = function ({ roots }) {
   let updateRoot = this;
   let changeCbArgs = [];
   for (let level of this._offspringLevels) {
-    for (let child of level) {
-      let involvedParents = child._parents.filter(function (parent) {
-        return parent instanceof Slot &&
-          (parent._id === updateRoot._id ||
-           (updateRoot._offspringMap[parent._id] && !cleanSlots[parent._id]));
+    for (let follower of level) {
+      let involved = follower._followings.filter(function (following) {
+        return following instanceof Slot &&
+          (following._id === updateRoot._id ||
+           (updateRoot._offspringMap[following._id] && !cleanSlots[following._id]));
       });
-      // clean child will be untouched
-      let dirty = involvedParents.length > 0;
+      // clean follower will be untouched
+      let dirty = involved.length > 0;
       if (!dirty) {
-        cleanSlots[child._id] = child;
+        cleanSlots[follower._id] = follower;
         continue;
       }
-      child.debug && console.info(`slot: slot ${child._tag} will be refreshed`);
-      let context = {involvedParents, roots};
-      let oldV = child._value;
+      follower.debug && console.info(`slot: slot ${follower._tag} will be refreshed`);
+      let context = {involved, roots};
+      let oldV = follower._value;
       // DON'T CALL change callbacks
-      if (child.touch(false, context, false)) {
-        changeCbArgs.push([child, oldV, involvedParents]);
+      if (follower.touch(false, context, false)) {
+        changeCbArgs.push([follower, oldV, involved]);
       } else {
-        cleanSlots[child._id] = child;
+        cleanSlots[follower._id] = follower;
       }
     }
   }
   // call change callbacks at last
-  changeCbArgs.forEach(function ([slot, oldV, involvedParents]) {
-    for (let cb of slot._onChangeCbs) {
-      cb.apply(slot, [slot._value, oldV, { involvedParents, roots }]);
+  changeCbArgs.forEach(function ([slot, oldV, involved]) {
+    for (let cb of slot._changeCbs) {
+      cb.apply(slot, [slot._value, oldV, { involved, roots }]);
     }
   });
 };
 
+/**
+ * get or set the value, if no argument is given, get the current value of Slot,
+ * otherwise, set the value of Slot, *the mutation process* starts, and returns *this*
+ *
+ * @return {(any|Slot)}
+ * */
 Slot.prototype.val = function val(...args) {
   if (args.length === 0) {
     if (this._value === void 0 && typeof this._valueFunc === 'function') {
       this._value = this._valueFunc.apply(
         this, [
-          this._parents.map(it => it instanceof Slot? it.val(): it),
+          this._followings.map(it => it instanceof Slot? it.val(): it),
           { roots: [ this ] },
         ]
       );
@@ -276,8 +406,13 @@ Slot.prototype.val = function val(...args) {
   return this.setV(args[0]);
 };
 
+/**
+ * set the slot's value, and starts a *mutation process*
+ *
+ * @param {any} newV - the new value of slot,
+ * */
 Slot.prototype.setV = function setV(newV) {
-  if (typeof this._mutatedTester === 'function' && !this._mutatedTester(this.value, newV)) {
+  if (typeof this._mutationTester === 'function' && !this._mutationTester(this.value, newV)) {
     return this;
   }
   this.debug && console.info(
@@ -286,7 +421,7 @@ Slot.prototype.setV = function setV(newV) {
   let oldV = this._value;
   this._value = newV;
   this._propogate({ roots: [this] });
-  for (let cb of this._onChangeCbs) {
+  for (let cb of this._changeCbs) {
     cb.apply(this, [this._value, oldV, {
       roots: [this],
     }]);
@@ -294,22 +429,13 @@ Slot.prototype.setV = function setV(newV) {
   return this;
 };
 
-Slot.prototype.update = function () {
-  if (this.valueFunc) {
-    this.value = this.valueFunc.apply(
-      this,
-      [this.parents.map(parent => parent instanceof Slot? parent.val(): parent)]
-    );
-  }
-  this.val(this.value);
-};
 
-const _colletChildren = function _colletChildren(slots) {
+const _colletFollowers = function _colletFollowers(slots) {
   let ret = {};
   for (let o of slots) {
-    for (let k in o._childMap) {
-      let child = o._childMap[k];
-      ret[child._id] = child;
+    for (let k in o._followerMap) {
+      let follower = o._followerMap[k];
+      ret[follower._id] = follower;
     }
   }
   return _objectValues(ret);
@@ -318,14 +444,14 @@ const _colletChildren = function _colletChildren(slots) {
 Slot.prototype._setupOffsprings = function () {
   this._offspringMap = {};
   this._offspringLevels = [];
-  if (_isEmptyObj(this._childMap)) {
+  if (_isEmptyObj(this._followerMap)) {
     return this;
   }
   // level by level
   for (
-    let _offspringMap = _objectValues(this._childMap), level = 1;
+    let _offspringMap = _objectValues(this._followerMap), level = 1;
     _offspringMap.length;
-    _offspringMap = _colletChildren(_offspringMap), ++level
+    _offspringMap = _colletFollowers(_offspringMap), ++level
   )  {
     for (let i of _offspringMap) {
       if (!(i._id in this._offspringMap)) {
@@ -357,28 +483,36 @@ Slot.prototype._setupOffsprings = function () {
 };
 
 /**
- * make a slot change but its value is not mutatedTester
+ * touch a slot, that means, re-evaluate the slot's value forcely, and
+ * starts *mutation process* and call change callbacks if neccessary.
+ * usually, you don't need call this method, only when you need to mutate the
+ * following graph (like override, replaceFollowing, follow)
  *
- * @param context - if null, the touched slot is served as roots
- * @param propogate - if propogate the touch event
+ * @param propogate - if starts a *mutation process*, default is true
+ * @param context - if null, the touched slot is served as roots, default is null
+ * @param callChangeCbs - if call change callbacks, default is true
+ *
+ * @return {boolean} - return true if this Slot is mutated, else false
+ *
+ * @see Slot#override
  * */
-Slot.prototype.touch = function (propogate=true, context=null, callCbs=true) {
+Slot.prototype.touch = function (propogate=true, context=null, callChangeCbs=true) {
   let oldValue = this._value;
   if (!context) {
     context = { roots: [this] };
   }
   if (this._valueFunc) {
     let args = [
-      this._parents.map(parent => parent instanceof Slot? parent.val(): parent),
+      this._followings.map(following => following instanceof Slot? following.val(): following),
       context,
     ];
     this._value = this._valueFunc.apply(this, args);
   }
-  if (typeof this._mutatedTester == 'function' && !this._mutatedTester(oldValue, this._value)) {
+  if (typeof this._mutationTester == 'function' && !this._mutationTester(oldValue, this._value)) {
     return false;
   }
-  if (callCbs) {
-    for (let cb of this._onChangeCbs) {
+  if (callChangeCbs) {
+    for (let cb of this._changeCbs) {
       cb.apply(this, [this._value, oldValue, context]);
     }
   }
@@ -386,80 +520,96 @@ Slot.prototype.touch = function (propogate=true, context=null, callCbs=true) {
   return true;
 };
 
-Slot.prototype.makeChild = function (f, mutatedTester) {
-  return Slot(function ([parent]) {
-    return f(parent);
-  }, [this]).mutatedTester(mutatedTester);
+/**
+ * make a follower slot of me. this following has only one followings it is me.
+ * @example
+ * const $$s1 = $$(1);
+ * const $$s2 = $$s1.fork(n => n + 1);
+ *
+ * is equivalent to:
+ *
+ * @example
+ * const $$s1 = $$(1);
+ * const $$s2 = $$(([n]) => n + 1, [$$s1]);
+ *
+ * @param {function} func - the evaluation function
+ * */
+Slot.prototype.fork = function (func) {
+  return Slot(function ([following]) {
+    return func(following);
+  }, [this]);
 };
 
-Slot.prototype.watch = function (valueFunc, parents, eager) {
-  // if connect to the same parents, nothing happens
-  let connectTheSameParents = true;
-  for (let i = 0; i < Math.max(parents.length, this._parents.length); ++i) {
-    if (parents[i] != this._parents[i]) {
-      connectTheSameParents = false;
+/**
+ * unfollow all the followings if any and follow the new followings using the new
+ * valueFunc, this method will mutate the following graph.
+ *
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param {function} valueFunc
+ * @param {array} followings - please see Slot's constructor
+ *
+ * @return {Slot} this
+ *
+ * @see {@link Slot}
+ * */
+Slot.prototype.follow = function (valueFunc, followings) {
+  // if connect to the same followings, nothing happens
+  let connectTheSameFollowings = true;
+  for (let i = 0; i < Math.max(followings.length, this._followings.length); ++i) {
+    if (followings[i] != this._followings[i]) {
+      connectTheSameFollowings = false;
       break;
     }
   }
-  if (connectTheSameParents && (valueFunc == this.valueFunc)) {
+  if (connectTheSameFollowings && (valueFunc == this._valueFunc)) {
     return this;
   }
   let self = this;
   // make my value invalid
   self._value = void 0;
   self._valueFunc = valueFunc;
-  // affected parents slots
+  // affected followings slots
   let affected = {};
-  for (let slot of parents) {
+  for (let slot of followings) {
     if (slot instanceof Slot) {
       affected[slot._id] = slot;
     }
   }
-  for (let parent of self._parents) {
-    if (parent instanceof Slot) {
-      if (parents.every(function (s) {
-        return s !== parent;
+  for (let following of self._followings) {
+    if (following instanceof Slot) {
+      if (followings.every(function (s) {
+        return s !== following;
       })) {
-        affected[parent._id] = parent;
-        delete parent._childMap[self._id];
+        affected[following._id] = following;
+        delete following._followerMap[self._id];
       }
     }
   }
-  // setup parents
-  self._parents = [];
-  parents.forEach(function (slot) {
-    self._parents.push(slot);
+  // setup followings
+  self._followings = [];
+  followings.forEach(function (slot) {
+    self._followings.push(slot);
     if (slot instanceof Slot) {
-      slot._childMap[self._id] = self;
+      slot._followerMap[self._id] = self;
     }
   });
-  // initialize
-  if (eager && self._parents.length) {
-    self._value = self._valueFunc.apply(
-      self, [
-        self._parents
-        .map(parent => parent instanceof Slot? parent.val(): parent),
-        function (parents) {
-          return { roots: parents, involvedParents: parents };
-        }(self._parents.filter(it => it instanceof Slot)),
-      ]
-    );
-  }
   // make ancestors' _offspringMap obsolete, it will be
   // recalculated until they are evaluated
-  self.getAncestors().forEach(function (ancestor) {
+  self._getAncestors().forEach(function (ancestor) {
     ancestor._offspringLevels = ancestor._offspringMap = void 0;
   });
   return self;
 };
 
-Slot.prototype.getAncestors = function() {
+Slot.prototype._getAncestors = function _getAncestors() {
   let ancestors = {};
-  for (let parent of this._parents) {
-    if (parent instanceof Slot) {
-      if (!ancestors[parent._id]) {
-        ancestors[parent._id] = parent;
-        for (let ancestor of parent.getAncestors()) {
+  for (let following of this._followings) {
+    if (following instanceof Slot) {
+      if (!ancestors[following._id]) {
+        ancestors[following._id] = following;
+        for (let ancestor of following._getAncestors()) {
           ancestors[ancestor._id] = ancestor;
         }
       }
@@ -468,42 +618,84 @@ Slot.prototype.getAncestors = function() {
   return _objectValues(ancestors);
 };
 
-// opposite operation to watch
+
+/**
+ * shrink to a data slot with value *val*
+ * @return {Slot} this
+ * */
 Slot.prototype.shrink = function (val) {
-  return this.watch(void 0, []).val(val);
+  this._valueFunc = void 0;
+  return this.follow(void 0, []).val(val);
 };
 
 
-// /**
-//  * note! a child has only one chance to setup its parents
-//  * */
-// const watch = function watch(
-//   slots, valueFunc, mutatedTester, lazy=true
-// ) {
-//   return (new Slot()).watch(slots, valueFunc, mutatedTester, lazy);
-// };
-
-const updateBy = function (slotFnPairs) {
+/**
+ * update a group of slots by applying functions upon them, and starts a
+ * *mutation proccess* whose roots are these slots to be changed
+ *
+ * @example
+ * let $$p1 = $$(1).tag('p1');
+ * let $$p2 = $$(2).tag('p2');
+ * let $$p3 = $$p2.fork(it => it + 1).tag('p3');
+ * let $$p4 = $$(function ([p1, p2, p3], { roots, involved }) {
+ *   console.log(roots.map(it => it.tag())); // p1, p2
+ *   console.log(involved.map(it => it.tag())); // p1, p2, p3
+ *   return p1 + p2 + p3;
+ * }, [$$p1, $$p2, $$p3]);
+ * $$.applyWith([
+ *   [$$p1, n => n + 1],
+ *   [$$p2, n => n + 2],
+ * ]);
+ * console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11
+ *
+ * @param {array} slotValuePairs - each element is an array, whose first value is
+ * a Slot, and second is the function to be applied
+ *
+ * */
+const applyWith = function (slotFnPairs) {
   return update(slotFnPairs.map(function ([slot, fn]) {
     return [slot, fn && fn.apply(slot, [slot.val()])];
   }));
 };
 
+/**
+ * update a group of slots, and starts a *mutation proccess* whose
+ * roots are these slots to be changed
+ *
+ * @example
+ * let $$p1 = $$(1).tag('p1');
+ * let $$p2 = $$(2).tag('p2');
+ * let $$p3 = $$p2.fork(it => it + 1).tag('p3');
+ * let $$p4 = $$(function ([p1, p2, p3], { roots, involved }) {
+ *   console.log(roots.map(it => it.tag())); // p1, p2
+ *   console.log(involved.map(it => it.tag())); // p1, p2, p3
+ *   return p1 + p2 + p3;
+ * }, [$$p1, $$p2, $$p3]);
+ * $$.applyWith([
+ *   [$$p1, 2],
+ *   [$$p2, 4],
+ * ]);
+ * console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11
+ *
+ * @param {array} slotValuePairs - each element is an array, whose first value is
+ * a Slot, and second is the new value of slots
+ *
+ * */
 const update = function (slotValuePairs) {
   let cleanSlots = {};
   let roots = slotValuePairs.map(([slot]) => slot);
   // update the targets directly
   slotValuePairs.forEach(function ([slot, value]) {
-    slot.debug && console.info(`slot ${slot._tag} mutatedTester`, slot._value, value);
+    slot.debug && console.info(`slot ${slot._tag} mutationTester`, slot._value, value);
     let oldValue = slot._value;
     if (value !== void 0) {
       slot._value = value;
-      if (slot._mutatedTester && !slot._mutatedTester(oldValue, value)) {
+      if (slot._mutationTester && !slot._mutationTester(oldValue, value)) {
         cleanSlots[slot._id] = slot;
         return;
       }
     }
-    for (let cb of slot._onChangeCbs) {
+    for (let cb of slot._changeCbs) {
       cb.call(slot, slot._value, oldValue, { roots });
     }
   });
@@ -548,39 +740,79 @@ const update = function (slotValuePairs) {
   });
   let changeCbArgs = [];
   for (let level of levels) {
-    for (let child of level) {
-      let involvedParents = child._parents.filter(function (p) {
+    for (let follower of level) {
+      let involved = follower._followings.filter(function (p) {
         return p instanceof Slot && relatedSlots[p._id] && !cleanSlots[p._id];
       });
-      if (!involvedParents.length) {
-        cleanSlots[child._id] = child;
+      if (!involved.length) {
+        cleanSlots[follower._id] = follower;
         continue;
       }
-      child.debug && console.info(
-        `slot: slot ${child._tag} will be refreshed`
+      follower.debug && console.info(
+        `slot: slot ${follower._tag} will be refreshed`
       );
-      let context = { involvedParents, roots };
+      let context = { involved, roots };
       // DON'T use val(), val will reevaluate this slot
-      let oldV = child._value;
+      let oldV = follower._value;
       // DON'T CALL change callbacks
-      if (child.touch(false, context, false)) {
-        changeCbArgs.push([child, oldV, involvedParents]);
+      if (follower.touch(false, context, false)) {
+        changeCbArgs.push([follower, oldV, involved]);
       } else {
-        cleanSlots[child._id] = child;
+        cleanSlots[follower._id] = follower;
       }
     }
   }
   // call change callbacks at last
-  changeCbArgs.forEach(function ([slot, oldV, involvedParents]) {
-    for (let cb of slot._onChangeCbs) {
-      cb.apply(slot, [slot._value, oldV, { involvedParents, roots }]);
+  changeCbArgs.forEach(function ([slot, oldV, involved]) {
+    for (let cb of slot._changeCbs) {
+      cb.apply(slot, [slot._value, oldV, { involved, roots }]);
     }
   });
 };
 
-Slot.prototype.applyWith = function applyWith(f, args=[]) {
+/**
+ * apply the function to me
+ *
+ * @example
+ * const $$s = $$(1);
+ * $$s.applyWith(function (s, n) {
+ *  return s + n;
+ * }, [2]);
+ * console.log($$s.val()); // output 3
+ *
+ * is equivalent to
+ * @example
+ * const $$s = $$(1);
+ * $$s.val(function (s, n) { return s + n; }($$s.val(), 2));
+ *
+ * @param {function} func - the mutation function
+ * @param {array} args - the extra arguments provided to func, default is []
+ *
+ * @return {Slot} this
+ *
+ * */
+Slot.prototype.applyWith = function applyWith(func, args=[]) {
   args = [this._value].concat(args);
-  return this.val(f.apply(this, args));
+  return this.val(func.apply(this, args));
+};
+
+/**
+ * add methods to Slot's prototype
+ *
+ * @example
+ * $$.mixin({
+ *   negate() {
+ *     return this.val(-this.val());
+ *   }
+ * });
+ * const $$s = $$(1).negate();
+ * console.log($$s.val()); // output -1
+ *
+ * @param {object} mixins - the mixins to be added
+ *
+ * */
+const mixin = function mixin(mixins) {
+  Object.assign(Slot.prototype, mixins);
 };
 
 export default (function ($$) {
@@ -589,14 +821,11 @@ export default (function ($$) {
     return new Slot(args);
   };
   $$.update = update;
-  $$.updateBy = updateBy;
-  $$.mixin = function mixin(mixins) {
-    Object.assign(Slot.prototype, mixins);
-  };
+  $$.applyWith = applyWith;
+  $$.mixin = mixin;
   $$.mixin(booleanOps);
   $$.mixin(objectOps);
   $$.mixin(numberOps);
   $$.mixin(listOps);
-  $$.mixin(stringOps);
   return $$;
 })(Slot);

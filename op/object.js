@@ -1,25 +1,68 @@
+/**
+ * these are a group of operations to mutate a slot with value type of Object
+ *
+ * @lends Slot.prototype
+ *
+ * */
 export default {
+  /**
+   * patch the object value
+   * @example
+   * const $$s = $$({ name: 'Tom', color: 'Blue' });
+   * $$s.patch({ name: 'Jerry', species: 'Mouse' });
+   * console.log($$s.val()); // { name: 'Jerry', species: 'Mouse', colur: 'Blue' }
+   *
+   * @param {object} obj - object used to patch me
+   * @return {Slot} this
+   *
+   * */
   patch(obj) {
     this.debug && console.info(
       `slot: slot ${this.tag()} is about to be patched`, obj
     );
-    this.val(Object.assign(this.val(), obj));
-    return this;
+    return this.val(Object.assign(this.val(), obj));
   },
+  /**
+   * omit the keys
+   * @example
+   * const $$s = $$({ name: 'Tom', color: 'Blue' });
+   * $$s.omit(['color']);
+   * console.log($$s.val(); // { name: 'Tom' }
+   *
+   * @return {Slot} this
+   * */
   omit(keys) {
     for (let field of keys) {
       delete this._value[field];
     }
-    this.val(this._value);
-    return this;
+    return this.val(this._value);
   },
+  /**
+   * set the property of Slot's value
+   * @example
+   * const $$s = $$({ name: 'Tom', color: 'Red' });
+   * $$s.setProp('color', 'Blue');
+   * console.log($$s.val(); // { name: 'Tom', color: 'Red' }
+   *
+   * @return {Slot} this
+   * */
   setProp(prop, value) {
     if (typeof value == 'function') {
       value = value.apply(this, [this.value[prop]]);
     }
     this.value[prop] = value;
     this.touch();
+    return this;
   },
+  /**
+   * set the deep property of Slot's value
+   * @example
+   * const $$s = $$({ name: 'Tom' });
+   * $$s.setPath(['friend', 'name'], 'Jerry');
+   * console.log($$s.val(); // { name: 'Tom', frien: { 'name': 'Red'} }
+   *
+   * @return {Slot} this
+   * */
   setPath(path, value) {
     let o = this.value;
     for (let seg of path.slice(0, -1)) {
@@ -32,5 +75,6 @@ export default {
     }
     o[lastSeg] = value;
     this.touch();
+    return this;
   }
 };
