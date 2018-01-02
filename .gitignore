@@ -8,7 +8,6 @@ Session.vim
 .netrwhist
 *~
 
-docs/
 node_modules/
 samples/**/ripple.js
 samples/**/ripple.js.map
