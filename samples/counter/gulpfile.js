@@ -28,7 +28,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('link', function (cb) {
-  exec('ln -sf ../../../dist/ripple.js ./js', (err) => {
+  exec('ln -sf ../../../dist/rimple.js ./js', (err) => {
     if (err) {
       console.log('please run npm build in package root directory!');
       return;

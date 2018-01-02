@@ -41,12 +41,12 @@ gulp.task('build', function () {
 });
 
 gulp.task('link', function (cb) {
-  exec('ln -sf ../../../dist/ripple.js ./js/ripple.js', (err) => {
+  exec('ln -sf ../../../dist/rimple.js ./js/rimple.js', (err) => {
     if (err) {
       console.log('please run npm build in package root directory!');
       return;
     }
-    exec('ln -sf ../../../dist/ripple.js.map ./js/ripple.js.map', () => {
+    exec('ln -sf ../../../dist/rimple.js.map ./js/rimple.js.map', () => {
       cb();
     });
   });
