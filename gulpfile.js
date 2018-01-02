@@ -9,7 +9,7 @@ const { production } = require('gulp-environments');
 const { exec } = require('child_process');
 
 gulp.task('doc', function (cb) {
-  exec('node_modules/jsdoc/jsdoc.js README.js index.js op/*.js -c ./.jsdoc.json -d docs', () => {
+  exec('node_modules/jsdoc/jsdoc.js README.md index.js op/*.js -c ./.jsdoc.json -d docs', () => {
     cb();
   });
 });
