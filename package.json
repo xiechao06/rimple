@@ -1,6 +1,6 @@
 {
-  "name": "slot",
-  "version": "1.0.0",
+  "name": "ripple-js",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "dependencies": {},
@@ -30,6 +30,6 @@
   "scripts": {
     "test": "./node_modules/gulp/bin/gulp.js test"
   },
-  "author": "",
+  "author": "xiechao06",
   "license": "ISC"
 }
