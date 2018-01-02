@@ -7,12 +7,12 @@ A deadly simple reactive frontend library.
 # QUICKSTART
 
 ```
-$ npm install rimple-js
+$ npm install rimple
 ```
 then add the following codes to you html files:
 
 ```html
-<script src="path/to/rimple-js/dist/rimple.min.js">
+<script src="path/to/rimple/dist/rimple.min.js">
 ```
 
 # TEST
