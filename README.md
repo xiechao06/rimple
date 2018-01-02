@@ -23,3 +23,5 @@ $ npm install
 $ npm test
 ```
 
+
+# [中文文档](https://github.com/xiechao06/ripple-js/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3)
