@@ -4,19 +4,42 @@ var main = (function () {
 var nativeIsArray = Array.isArray;
 var toString = Object.prototype.toString;
 
-var xIsArray = nativeIsArray || isArray;
+var _0_1_0_xIsArray = nativeIsArray || isArray;
 
 function isArray(obj) {
     return toString.call(obj) === "[object Array]"
 }
 
+
+
+var _0_1_0_xIsArray$2 = Object.freeze({
+	default: _0_1_0_xIsArray,
+	__moduleExports: _0_1_0_xIsArray
+});
+
 var version = "2";
+
+
+
+var version$2 = Object.freeze({
+	default: version,
+	__moduleExports: version
+});
+
+var version$3 = ( version$2 && version ) || version$2;
 
 var isVnode = isVirtualNode;
 
 function isVirtualNode(x) {
-    return x && x.type === "VirtualNode" && x.version === version
+    return x && x.type === "VirtualNode" && x.version === version$3
 }
+
+
+
+var isVnode$2 = Object.freeze({
+	default: isVnode,
+	__moduleExports: isVnode
+});
 
 var isWidget_1 = isWidget;
 
@@ -24,11 +47,25 @@ function isWidget(w) {
     return w && w.type === "Widget"
 }
 
+
+
+var isWidget$1 = Object.freeze({
+	default: isWidget_1,
+	__moduleExports: isWidget_1
+});
+
 var isThunk_1 = isThunk;
 
 function isThunk(t) {
     return t && t.type === "Thunk"
 }
+
+
+
+var isThunk$1 = Object.freeze({
+	default: isThunk_1,
+	__moduleExports: isThunk_1
+});
 
 var isVhook = isHook;
 
@@ -37,6 +74,21 @@ function isHook(hook) {
       (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") ||
        typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
 }
+
+
+
+var isVhook$2 = Object.freeze({
+	default: isVhook,
+	__moduleExports: isVhook
+});
+
+var isVNode = ( isVnode$2 && isVnode ) || isVnode$2;
+
+var isWidget$2 = ( isWidget$1 && isWidget_1 ) || isWidget$1;
+
+var isThunk$2 = ( isThunk$1 && isThunk_1 ) || isThunk$1;
+
+var isHook$1 = ( isVhook$2 && isVhook ) || isVhook$2;
 
 var vnode = VirtualNode;
 
@@ -60,7 +112,7 @@ function VirtualNode(tagName, properties, children, key, namespace) {
     for (var propName in properties) {
         if (properties.hasOwnProperty(propName)) {
             var property = properties[propName];
-            if (isVhook(property) && property.unhook) {
+            if (isHook$1(property) && property.unhook) {
                 if (!hooks) {
                     hooks = {};
                 }
@@ -72,7 +124,7 @@ function VirtualNode(tagName, properties, children, key, namespace) {
 
     for (var i = 0; i < count; i++) {
         var child = children[i];
-        if (isVnode(child)) {
+        if (isVNode(child)) {
             descendants += child.count || 0;
 
             if (!hasWidgets && child.hasWidgets) {
@@ -86,11 +138,11 @@ function VirtualNode(tagName, properties, children, key, namespace) {
             if (!descendantHooks && (child.hooks || child.descendantHooks)) {
                 descendantHooks = true;
             }
-        } else if (!hasWidgets && isWidget_1(child)) {
+        } else if (!hasWidgets && isWidget$2(child)) {
             if (typeof child.destroy === "function") {
                 hasWidgets = true;
             }
-        } else if (!hasThunks && isThunk_1(child)) {
+        } else if (!hasThunks && isThunk$2(child)) {
             hasThunks = true;
         }
     }
@@ -102,8 +154,15 @@ function VirtualNode(tagName, properties, children, key, namespace) {
     this.descendantHooks = descendantHooks;
 }
 
-VirtualNode.prototype.version = version;
+VirtualNode.prototype.version = version$3;
 VirtualNode.prototype.type = "VirtualNode";
+
+
+
+var vnode$2 = Object.freeze({
+	default: vnode,
+	__moduleExports: vnode
+});
 
 var vtext = VirtualText;
 
@@ -111,14 +170,28 @@ function VirtualText(text) {
     this.text = String(text);
 }
 
-VirtualText.prototype.version = version;
+VirtualText.prototype.version = version$3;
 VirtualText.prototype.type = "VirtualText";
+
+
+
+var vtext$2 = Object.freeze({
+	default: vtext,
+	__moduleExports: vtext
+});
 
 var isVtext = isVirtualText;
 
 function isVirtualText(x) {
-    return x && x.type === "VirtualText" && x.version === version
+    return x && x.type === "VirtualText" && x.version === version$3
 }
+
+
+
+var isVtext$2 = Object.freeze({
+	default: isVtext,
+	__moduleExports: isVtext
+});
 
 /*!
  * Cross-Browser Split 1.1.1
@@ -151,7 +224,7 @@ function isVirtualText(x) {
  * split('..word1 word2..', /([a-z]+)(\d+)/i);
  * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
  */
-var browserSplit = (function split(undef) {
+var _0_0_1_browserSplit = (function split(undef) {
 
   var nativeSplit = String.prototype.split,
     compliantExecNpcg = /()??/.exec("")[1] === undef,
@@ -227,6 +300,15 @@ var browserSplit = (function split(undef) {
   return self;
 })();
 
+
+
+var _0_0_1_browserSplit$2 = Object.freeze({
+	default: _0_0_1_browserSplit,
+	__moduleExports: _0_0_1_browserSplit
+});
+
+var split = ( _0_0_1_browserSplit$2 && _0_0_1_browserSplit ) || _0_0_1_browserSplit$2;
+
 'use strict';
 
 
@@ -243,7 +325,7 @@ function parseTag(tag, props) {
 
     var noId = !(props.hasOwnProperty('id'));
 
-    var tagParts = browserSplit(tag, classIdSplit);
+    var tagParts = split(tag, classIdSplit);
     var tagName = null;
 
     if (notClassId.test(tagParts[1])) {
@@ -282,6 +364,13 @@ function parseTag(tag, props) {
     return props.namespace ? tagName : tagName.toUpperCase();
 }
 
+
+
+var parseTag$1 = Object.freeze({
+	default: parseTag_1,
+	__moduleExports: parseTag_1
+});
+
 'use strict';
 
 var softSetHook = SoftSetHook;
@@ -300,6 +389,13 @@ SoftSetHook.prototype.hook = function (node, propertyName) {
     }
 };
 
+
+
+var softSetHook$2 = Object.freeze({
+	default: softSetHook,
+	__moduleExports: softSetHook
+});
+
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 'use strict';
@@ -310,7 +406,7 @@ var root = typeof window !== 'undefined' ?
     window : typeof commonjsGlobal !== 'undefined' ?
     commonjsGlobal : {};
 
-var individual = Individual;
+var _3_0_0_individual = Individual;
 
 function Individual(key, value) {
     if (key in root) {
@@ -322,6 +418,15 @@ function Individual(key, value) {
     return value;
 }
 
+
+
+var _3_0_0_individual$2 = Object.freeze({
+	default: _3_0_0_individual,
+	__moduleExports: _3_0_0_individual
+});
+
+var Individual$1 = ( _3_0_0_individual$2 && _3_0_0_individual ) || _3_0_0_individual$2;
+
 'use strict';
 
 
@@ -332,7 +437,7 @@ function OneVersion(moduleName, version, defaultValue) {
     var key = '__INDIVIDUAL_ONE_VERSION_' + moduleName;
     var enforceKey = key + '_ENFORCE_SINGLETON';
 
-    var versionValue = individual(enforceKey, version);
+    var versionValue = Individual$1(enforceKey, version);
 
     if (versionValue !== version) {
         throw new Error('Can only have one copy of ' +
@@ -342,19 +447,28 @@ function OneVersion(moduleName, version, defaultValue) {
             'This means you cannot install version ' + version);
     }
 
-    return individual(key, defaultValue);
+    return Individual$1(key, defaultValue);
 }
+
+
+
+var oneVersion$2 = Object.freeze({
+	default: oneVersion,
+	__moduleExports: oneVersion
+});
+
+var OneVersionConstraint = ( oneVersion$2 && oneVersion ) || oneVersion$2;
 
 'use strict';
 
 
 
 var MY_VERSION = '7';
-oneVersion('ev-store', MY_VERSION);
+OneVersionConstraint('ev-store', MY_VERSION);
 
 var hashKey = '__EV_STORE_KEY@' + MY_VERSION;
 
-var evStore = EvStore;
+var _7_0_0_evStore = EvStore;
 
 function EvStore(elem) {
     var hash = elem[hashKey];
@@ -365,6 +479,15 @@ function EvStore(elem) {
 
     return hash;
 }
+
+
+
+var _7_0_0_evStore$2 = Object.freeze({
+	default: _7_0_0_evStore,
+	__moduleExports: _7_0_0_evStore
+});
+
+var EvStore$1 = ( _7_0_0_evStore$2 && _7_0_0_evStore ) || _7_0_0_evStore$2;
 
 'use strict';
 
@@ -381,18 +504,39 @@ function EvHook(value) {
 }
 
 EvHook.prototype.hook = function (node, propertyName) {
-    var es = evStore(node);
+    var es = EvStore$1(node);
     var propName = propertyName.substr(3);
 
     es[propName] = this.value;
 };
 
 EvHook.prototype.unhook = function(node, propertyName) {
-    var es = evStore(node);
+    var es = EvStore$1(node);
     var propName = propertyName.substr(3);
 
     es[propName] = undefined;
 };
+
+
+
+var evHook$2 = Object.freeze({
+	default: evHook,
+	__moduleExports: evHook
+});
+
+var isArray$1 = ( _0_1_0_xIsArray$2 && _0_1_0_xIsArray ) || _0_1_0_xIsArray$2;
+
+var VNode = ( vnode$2 && vnode ) || vnode$2;
+
+var VText = ( vtext$2 && vtext ) || vtext$2;
+
+var isVText = ( isVtext$2 && isVtext ) || isVtext$2;
+
+var parseTag$2 = ( parseTag$1 && parseTag_1 ) || parseTag$1;
+
+var softSetHook$3 = ( softSetHook$2 && softSetHook ) || softSetHook$2;
+
+var evHook$3 = ( evHook$2 && evHook ) || evHook$2;
 
 'use strict';
 
@@ -410,9 +554,9 @@ EvHook.prototype.unhook = function(node, propertyName) {
 
 
 
-var virtualHyperscript = h;
+var virtualHyperscript = h$1;
 
-function h(tagName, properties, children) {
+function h$1(tagName, properties, children) {
     var childNodes = [];
     var tag, props, key, namespace;
 
@@ -422,7 +566,7 @@ function h(tagName, properties, children) {
     }
 
     props = props || properties || {};
-    tag = parseTag_1(tagName, props);
+    tag = parseTag$2(tagName, props);
 
     // support keys
     if (props.hasOwnProperty('key')) {
@@ -441,9 +585,9 @@ function h(tagName, properties, children) {
         !namespace &&
         props.hasOwnProperty('value') &&
         props.value !== undefined &&
-        !isVhook(props.value)
+        !isHook$1(props.value)
     ) {
-        props.value = softSetHook(props.value);
+        props.value = softSetHook$3(props.value);
     }
 
     transformProperties(props);
@@ -453,17 +597,17 @@ function h(tagName, properties, children) {
     }
 
 
-    return new vnode(tag, props, childNodes, key, namespace);
+    return new VNode(tag, props, childNodes, key, namespace);
 }
 
 function addChild(c, childNodes, tag, props) {
     if (typeof c === 'string') {
-        childNodes.push(new vtext(c));
+        childNodes.push(new VText(c));
     } else if (typeof c === 'number') {
-        childNodes.push(new vtext(String(c)));
+        childNodes.push(new VText(String(c)));
     } else if (isChild(c)) {
         childNodes.push(c);
-    } else if (xIsArray(c)) {
+    } else if (isArray$1(c)) {
         for (var i = 0; i < c.length; i++) {
             addChild(c[i], childNodes, tag, props);
         }
@@ -485,24 +629,24 @@ function transformProperties(props) {
         if (props.hasOwnProperty(propName)) {
             var value = props[propName];
 
-            if (isVhook(value)) {
+            if (isHook$1(value)) {
                 continue;
             }
 
             if (propName.substr(0, 3) === 'ev-') {
                 // add ev-foo support
-                props[propName] = evHook(value);
+                props[propName] = evHook$3(value);
             }
         }
     }
 }
 
 function isChild(x) {
-    return isVnode(x) || isVtext(x) || isWidget_1(x) || isThunk_1(x);
+    return isVNode(x) || isVText(x) || isWidget$2(x) || isThunk$2(x);
 }
 
 function isChildren(x) {
-    return typeof x === 'string' || xIsArray(x) || isChild(x);
+    return typeof x === 'string' || isArray$1(x) || isChild(x);
 }
 
 function UnexpectedVirtualElement(data) {
@@ -532,7 +676,23 @@ function errorString(obj) {
     }
 }
 
-var h_1 = virtualHyperscript;
+
+
+var virtualHyperscript$2 = Object.freeze({
+	default: virtualHyperscript,
+	__moduleExports: virtualHyperscript
+});
+
+var h$2 = ( virtualHyperscript$2 && virtualHyperscript ) || virtualHyperscript$2;
+
+var h_1 = h$2;
+
+
+
+var h = Object.freeze({
+	default: h_1,
+	__moduleExports: h_1
+});
 
 VirtualPatch.NONE = 0;
 VirtualPatch.VTEXT = 1;
@@ -552,8 +712,15 @@ function VirtualPatch(type, vNode, patch) {
     this.patch = patch;
 }
 
-VirtualPatch.prototype.version = version;
+VirtualPatch.prototype.version = version$3;
 VirtualPatch.prototype.type = "VirtualPatch";
+
+
+
+var vpatch$2 = Object.freeze({
+	default: vpatch,
+	__moduleExports: vpatch
+});
 
 var handleThunk_1 = handleThunk;
 
@@ -561,11 +728,11 @@ function handleThunk(a, b) {
     var renderedA = a;
     var renderedB = b;
 
-    if (isThunk_1(b)) {
+    if (isThunk$2(b)) {
         renderedB = renderThunk(b, a);
     }
 
-    if (isThunk_1(a)) {
+    if (isThunk$2(a)) {
         renderedA = renderThunk(a, null);
     }
 
@@ -582,20 +749,36 @@ function renderThunk(thunk, previous) {
         renderedThunk = thunk.vnode = thunk.render(previous);
     }
 
-    if (!(isVnode(renderedThunk) ||
-            isVtext(renderedThunk) ||
-            isWidget_1(renderedThunk))) {
+    if (!(isVNode(renderedThunk) ||
+            isVText(renderedThunk) ||
+            isWidget$2(renderedThunk))) {
         throw new Error("thunk did not return a valid node");
     }
 
     return renderedThunk
 }
 
+
+
+var handleThunk$1 = Object.freeze({
+	default: handleThunk_1,
+	__moduleExports: handleThunk_1
+});
+
 "use strict";
 
-var isObject = function isObject(x) {
+var _1_0_1_isObject = function isObject(x) {
 	return typeof x === "object" && x !== null;
 };
+
+
+
+var _1_0_1_isObject$2 = Object.freeze({
+	default: _1_0_1_isObject,
+	__moduleExports: _1_0_1_isObject
+});
+
+var isObject = ( _1_0_1_isObject$2 && _1_0_1_isObject ) || _1_0_1_isObject$2;
 
 var diffProps_1 = diffProps;
 
@@ -617,7 +800,7 @@ function diffProps(a, b) {
             if (getPrototype(bValue) !== getPrototype(aValue)) {
                 diff = diff || {};
                 diff[aKey] = bValue;
-            } else if (isVhook(bValue)) {
+            } else if (isHook$1(bValue)) {
                  diff = diff || {};
                  diff[aKey] = bValue;
             } else {
@@ -653,9 +836,22 @@ function getPrototype(value) {
   }
 }
 
-var diff_1$2 = diff;
 
-function diff(a, b) {
+
+var diffProps$1 = Object.freeze({
+	default: diffProps_1,
+	__moduleExports: diffProps_1
+});
+
+var VPatch = ( vpatch$2 && vpatch ) || vpatch$2;
+
+var handleThunk$2 = ( handleThunk$1 && handleThunk_1 ) || handleThunk$1;
+
+var diffProps$2 = ( diffProps$1 && diffProps_1 ) || diffProps$1;
+
+var diff_1$2 = diff$1;
+
+function diff$1(a, b) {
     var patch = { a: a };
     walk(a, b, patch, 0);
     return patch
@@ -669,51 +865,51 @@ function walk(a, b, patch, index) {
     var apply = patch[index];
     var applyClear = false;
 
-    if (isThunk_1(a) || isThunk_1(b)) {
+    if (isThunk$2(a) || isThunk$2(b)) {
         thunks(a, b, patch, index);
     } else if (b == null) {
 
         // If a is a widget we will add a remove patch for it
         // Otherwise any child widgets/hooks must be destroyed.
         // This prevents adding two remove patches for a widget.
-        if (!isWidget_1(a)) {
+        if (!isWidget$2(a)) {
             clearState(a, patch, index);
             apply = patch[index];
         }
 
-        apply = appendPatch(apply, new vpatch(vpatch.REMOVE, a, b));
-    } else if (isVnode(b)) {
-        if (isVnode(a)) {
+        apply = appendPatch(apply, new VPatch(VPatch.REMOVE, a, b));
+    } else if (isVNode(b)) {
+        if (isVNode(a)) {
             if (a.tagName === b.tagName &&
                 a.namespace === b.namespace &&
                 a.key === b.key) {
-                var propsPatch = diffProps_1(a.properties, b.properties);
+                var propsPatch = diffProps$2(a.properties, b.properties);
                 if (propsPatch) {
                     apply = appendPatch(apply,
-                        new vpatch(vpatch.PROPS, a, propsPatch));
+                        new VPatch(VPatch.PROPS, a, propsPatch));
                 }
                 apply = diffChildren(a, b, patch, apply, index);
             } else {
-                apply = appendPatch(apply, new vpatch(vpatch.VNODE, a, b));
+                apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b));
                 applyClear = true;
             }
         } else {
-            apply = appendPatch(apply, new vpatch(vpatch.VNODE, a, b));
+            apply = appendPatch(apply, new VPatch(VPatch.VNODE, a, b));
             applyClear = true;
         }
-    } else if (isVtext(b)) {
-        if (!isVtext(a)) {
-            apply = appendPatch(apply, new vpatch(vpatch.VTEXT, a, b));
+    } else if (isVText(b)) {
+        if (!isVText(a)) {
+            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b));
             applyClear = true;
         } else if (a.text !== b.text) {
-            apply = appendPatch(apply, new vpatch(vpatch.VTEXT, a, b));
+            apply = appendPatch(apply, new VPatch(VPatch.VTEXT, a, b));
         }
-    } else if (isWidget_1(b)) {
-        if (!isWidget_1(a)) {
+    } else if (isWidget$2(b)) {
+        if (!isWidget$2(a)) {
             applyClear = true;
         }
 
-        apply = appendPatch(apply, new vpatch(vpatch.WIDGET, a, b));
+        apply = appendPatch(apply, new VPatch(VPatch.WIDGET, a, b));
     }
 
     if (apply) {
@@ -743,21 +939,21 @@ function diffChildren(a, b, patch, apply, index) {
             if (rightNode) {
                 // Excess nodes in b need to be added
                 apply = appendPatch(apply,
-                    new vpatch(vpatch.INSERT, null, rightNode));
+                    new VPatch(VPatch.INSERT, null, rightNode));
             }
         } else {
             walk(leftNode, rightNode, patch, index);
         }
 
-        if (isVnode(leftNode) && leftNode.count) {
+        if (isVNode(leftNode) && leftNode.count) {
             index += leftNode.count;
         }
     }
 
     if (orderedSet.moves) {
         // Reorder nodes last
-        apply = appendPatch(apply, new vpatch(
-            vpatch.ORDER,
+        apply = appendPatch(apply, new VPatch(
+            VPatch.ORDER,
             a,
             orderedSet.moves
         ));
@@ -775,14 +971,14 @@ function clearState(vNode, patch, index) {
 // Patch records for all destroyed widgets must be added because we need
 // a DOM node reference for the destroy function
 function destroyWidgets(vNode, patch, index) {
-    if (isWidget_1(vNode)) {
+    if (isWidget$2(vNode)) {
         if (typeof vNode.destroy === "function") {
             patch[index] = appendPatch(
                 patch[index],
-                new vpatch(vpatch.REMOVE, vNode, null)
+                new VPatch(VPatch.REMOVE, vNode, null)
             );
         }
-    } else if (isVnode(vNode) && (vNode.hasWidgets || vNode.hasThunks)) {
+    } else if (isVNode(vNode) && (vNode.hasWidgets || vNode.hasThunks)) {
         var children = vNode.children;
         var len = children.length;
         for (var i = 0; i < len; i++) {
@@ -791,21 +987,21 @@ function destroyWidgets(vNode, patch, index) {
 
             destroyWidgets(child, patch, index);
 
-            if (isVnode(child) && child.count) {
+            if (isVNode(child) && child.count) {
                 index += child.count;
             }
         }
-    } else if (isThunk_1(vNode)) {
+    } else if (isThunk$2(vNode)) {
         thunks(vNode, null, patch, index);
     }
 }
 
 // Create a sub-patch for thunks
 function thunks(a, b, patch, index) {
-    var nodes = handleThunk_1(a, b);
-    var thunkPatch = diff(nodes.a, nodes.b);
+    var nodes = handleThunk$2(a, b);
+    var thunkPatch = diff$1(nodes.a, nodes.b);
     if (hasPatches(thunkPatch)) {
-        patch[index] = new vpatch(vpatch.THUNK, null, thunkPatch);
+        patch[index] = new VPatch(VPatch.THUNK, null, thunkPatch);
     }
 }
 
@@ -821,12 +1017,12 @@ function hasPatches(patch) {
 
 // Execute hooks when two nodes are identical
 function unhook(vNode, patch, index) {
-    if (isVnode(vNode)) {
+    if (isVNode(vNode)) {
         if (vNode.hooks) {
             patch[index] = appendPatch(
                 patch[index],
-                new vpatch(
-                    vpatch.PROPS,
+                new VPatch(
+                    VPatch.PROPS,
                     vNode,
                     undefinedKeys(vNode.hooks)
                 )
@@ -842,12 +1038,12 @@ function unhook(vNode, patch, index) {
 
                 unhook(child, patch, index);
 
-                if (isVnode(child) && child.count) {
+                if (isVNode(child) && child.count) {
                     index += child.count;
                 }
             }
         }
-    } else if (isThunk_1(vNode)) {
+    } else if (isThunk$2(vNode)) {
         thunks(vNode, null, patch, index);
     }
 }
@@ -1058,7 +1254,7 @@ function keyIndex(children) {
 
 function appendPatch(apply, patch) {
     if (apply) {
-        if (xIsArray(apply)) {
+        if (isArray$1(apply)) {
             apply.push(patch);
         } else {
             apply = [apply, patch];
@@ -1070,11 +1266,27 @@ function appendPatch(apply, patch) {
     }
 }
 
-var diff_1 = diff_1$2;
+
+
+var diff$2 = Object.freeze({
+	default: diff_1$2,
+	__moduleExports: diff_1$2
+});
+
+var diff$3 = ( diff$2 && diff_1$2 ) || diff$2;
+
+var diff_1 = diff$3;
+
+
+
+var diff = Object.freeze({
+	default: diff_1,
+	__moduleExports: diff_1
+});
 
 var slice = Array.prototype.slice;
 
-var domWalk = iterativelyWalk;
+var _0_1_1_domWalk = iterativelyWalk;
 
 function iterativelyWalk(nodes, cb) {
     if (!('length' in nodes)) {
@@ -1097,6 +1309,13 @@ function iterativelyWalk(nodes, cb) {
     }
 }
 
+
+
+var _0_1_1_domWalk$2 = Object.freeze({
+	default: _0_1_1_domWalk,
+	__moduleExports: _0_1_1_domWalk
+});
+
 var domComment = Comment;
 
 function Comment(data, owner) {
@@ -1116,6 +1335,13 @@ Comment.prototype.nodeName = "#comment";
 Comment.prototype.toString = function _Comment_toString() {
     return "[object Comment]"
 };
+
+
+
+var domComment$2 = Object.freeze({
+	default: domComment,
+	__moduleExports: domComment
+});
 
 var domText = DOMText;
 
@@ -1144,6 +1370,13 @@ DOMText.prototype.replaceData = function replaceData(index, length, value) {
     this.data = left + value + right;
     this.length = this.data.length;
 };
+
+
+
+var domText$2 = Object.freeze({
+	default: domText,
+	__moduleExports: domText
+});
 
 var dispatchEvent_1 = dispatchEvent;
 
@@ -1177,6 +1410,13 @@ function dispatchEvent(ev) {
     }
 }
 
+
+
+var dispatchEvent$1 = Object.freeze({
+	default: dispatchEvent_1,
+	__moduleExports: dispatchEvent_1
+});
+
 var addEventListener_1 = addEventListener;
 
 function addEventListener(type, listener) {
@@ -1194,6 +1434,13 @@ function addEventListener(type, listener) {
         elem.listeners[type].push(listener);
     }
 }
+
+
+
+var addEventListener$1 = Object.freeze({
+	default: addEventListener_1,
+	__moduleExports: addEventListener_1
+});
 
 var removeEventListener_1 = removeEventListener;
 
@@ -1214,6 +1461,13 @@ function removeEventListener(type, listener) {
         list.splice(index, 1);
     }
 }
+
+
+
+var removeEventListener$1 = Object.freeze({
+	default: removeEventListener_1,
+	__moduleExports: removeEventListener_1
+});
 
 var serialize = serializeNode;
 
@@ -1354,6 +1608,23 @@ function escapeText(s) {
 function escapeAttributeValue(str) {
     return escapeText(str).replace(/"/g, "&quot;")
 }
+
+
+
+var serialize$2 = Object.freeze({
+	default: serialize,
+	__moduleExports: serialize
+});
+
+var domWalk = ( _0_1_1_domWalk$2 && _0_1_1_domWalk ) || _0_1_1_domWalk$2;
+
+var dispatchEvent$2 = ( dispatchEvent$1 && dispatchEvent_1 ) || dispatchEvent$1;
+
+var addEventListener$2 = ( addEventListener$1 && addEventListener_1 ) || addEventListener$1;
+
+var removeEventListener$2 = ( removeEventListener$1 && removeEventListener_1 ) || removeEventListener$1;
+
+var serializeNode$1 = ( serialize$2 && serialize ) || serialize$2;
 
 var htmlns = "http://www.w3.org/1999/xhtml";
 
@@ -1507,9 +1778,9 @@ DOMElement.prototype.hasAttribute = function _Element_hasAttribute(name) {
     return this.hasAttributeNS(null, name)
 };
 
-DOMElement.prototype.removeEventListener = removeEventListener_1;
-DOMElement.prototype.addEventListener = addEventListener_1;
-DOMElement.prototype.dispatchEvent = dispatchEvent_1;
+DOMElement.prototype.removeEventListener = removeEventListener$2;
+DOMElement.prototype.addEventListener = addEventListener$2;
+DOMElement.prototype.dispatchEvent = dispatchEvent$2;
 
 // Un-implemented
 DOMElement.prototype.focus = function _Element_focus() {
@@ -1517,7 +1788,7 @@ DOMElement.prototype.focus = function _Element_focus() {
 };
 
 DOMElement.prototype.toString = function _Element_toString() {
-    return serialize(this)
+    return serializeNode$1(this)
 };
 
 DOMElement.prototype.getElementsByClassName = function _Element_getElementsByClassName(classNames) {
@@ -1559,6 +1830,15 @@ DOMElement.prototype.contains = function _Element_contains(element) {
     }) || false
 };
 
+
+
+var domElement$2 = Object.freeze({
+	default: domElement,
+	__moduleExports: domElement
+});
+
+var DOMElement$1 = ( domElement$2 && domElement ) || domElement$2;
+
 var domFragment = DocumentFragment;
 
 function DocumentFragment(owner) {
@@ -1575,9 +1855,9 @@ DocumentFragment.prototype.type = "DocumentFragment";
 DocumentFragment.prototype.nodeType = 11;
 DocumentFragment.prototype.nodeName = "#document-fragment";
 
-DocumentFragment.prototype.appendChild  = domElement.prototype.appendChild;
-DocumentFragment.prototype.replaceChild = domElement.prototype.replaceChild;
-DocumentFragment.prototype.removeChild  = domElement.prototype.removeChild;
+DocumentFragment.prototype.appendChild  = DOMElement$1.prototype.appendChild;
+DocumentFragment.prototype.replaceChild = DOMElement$1.prototype.replaceChild;
+DocumentFragment.prototype.removeChild  = DOMElement$1.prototype.removeChild;
 
 DocumentFragment.prototype.toString =
     function _DocumentFragment_toString() {
@@ -1585,6 +1865,13 @@ DocumentFragment.prototype.toString =
             return String(node)
         }).join("")
     };
+
+
+
+var domFragment$2 = Object.freeze({
+	default: domFragment,
+	__moduleExports: domFragment
+});
 
 var event = Event;
 
@@ -1600,7 +1887,22 @@ Event.prototype.preventDefault = function _Event_preventDefault() {
     
 };
 
-var document$1 = Document;
+
+
+var event$2 = Object.freeze({
+	default: event,
+	__moduleExports: event
+});
+
+var Comment$1 = ( domComment$2 && domComment ) || domComment$2;
+
+var DOMText$1 = ( domText$2 && domText ) || domText$2;
+
+var DocumentFragment$1 = ( domFragment$2 && domFragment ) || domFragment$2;
+
+var Event$1 = ( event$2 && event ) || event$2;
+
+var document$2 = Document;
 
 function Document() {
     if (!(this instanceof Document)) {
@@ -1618,28 +1920,28 @@ function Document() {
 
 var proto = Document.prototype;
 proto.createTextNode = function createTextNode(value) {
-    return new domText(value, this)
+    return new DOMText$1(value, this)
 };
 
 proto.createElementNS = function createElementNS(namespace, tagName) {
     var ns = namespace === null ? null : String(namespace);
-    return new domElement(tagName, this, ns)
+    return new DOMElement$1(tagName, this, ns)
 };
 
 proto.createElement = function createElement(tagName) {
-    return new domElement(tagName, this)
+    return new DOMElement$1(tagName, this)
 };
 
 proto.createDocumentFragment = function createDocumentFragment() {
-    return new domFragment(this)
+    return new DocumentFragment$1(this)
 };
 
 proto.createEvent = function createEvent(family) {
-    return new event(family)
+    return new Event$1(family)
 };
 
 proto.createComment = function createComment(data) {
-    return new domComment(data, this)
+    return new Comment$1(data, this)
 };
 
 proto.getElementById = function getElementById(id) {
@@ -1654,15 +1956,33 @@ proto.getElementById = function getElementById(id) {
     return result || null
 };
 
-proto.getElementsByClassName = domElement.prototype.getElementsByClassName;
-proto.getElementsByTagName = domElement.prototype.getElementsByTagName;
-proto.contains = domElement.prototype.contains;
+proto.getElementsByClassName = DOMElement$1.prototype.getElementsByClassName;
+proto.getElementsByTagName = DOMElement$1.prototype.getElementsByTagName;
+proto.contains = DOMElement$1.prototype.contains;
 
-proto.removeEventListener = removeEventListener_1;
-proto.addEventListener = addEventListener_1;
-proto.dispatchEvent = dispatchEvent_1;
+proto.removeEventListener = removeEventListener$2;
+proto.addEventListener = addEventListener$2;
+proto.dispatchEvent = dispatchEvent$2;
 
-var minDocument = new document$1();
+
+
+var document$4 = Object.freeze({
+	default: document$2,
+	__moduleExports: document$2
+});
+
+var Document$1 = ( document$4 && document$2 ) || document$4;
+
+var _2_19_0_minDocument = new Document$1();
+
+
+
+var _2_19_0_minDocument$2 = Object.freeze({
+	default: _2_19_0_minDocument,
+	__moduleExports: _2_19_0_minDocument
+});
+
+var minDoc = ( _2_19_0_minDocument$2 && _2_19_0_minDocument ) || _2_19_0_minDocument$2;
 
 var topLevel = typeof commonjsGlobal !== 'undefined' ? commonjsGlobal :
     typeof window !== 'undefined' ? window : {};
@@ -1676,11 +1996,18 @@ if (typeof document !== 'undefined') {
     doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'];
 
     if (!doccy) {
-        doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'] = minDocument;
+        doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'] = minDoc;
     }
 }
 
 var document_1 = doccy;
+
+
+
+var document$1 = Object.freeze({
+	default: document_1,
+	__moduleExports: document_1
+});
 
 var applyProperties_1 = applyProperties;
 
@@ -1690,7 +2017,7 @@ function applyProperties(node, props, previous) {
 
         if (propValue === undefined) {
             removeProperty(node, propName, propValue, previous);
-        } else if (isVhook(propValue)) {
+        } else if (isHook$1(propValue)) {
             removeProperty(node, propName, propValue, previous);
             if (propValue.hook) {
                 propValue.hook(node,
@@ -1711,7 +2038,7 @@ function removeProperty(node, propName, propValue, previous) {
     if (previous) {
         var previousValue = previous[propName];
 
-        if (!isVhook(previousValue)) {
+        if (!isHook$1(previousValue)) {
             if (propName === "attributes") {
                 for (var attrName in previousValue) {
                     node.removeAttribute(attrName);
@@ -1777,19 +2104,30 @@ function getPrototype$1(value) {
     }
 }
 
+
+
+var applyProperties$1 = Object.freeze({
+	default: applyProperties_1,
+	__moduleExports: applyProperties_1
+});
+
+var document$5 = ( document$1 && document_1 ) || document$1;
+
+var applyProperties$2 = ( applyProperties$1 && applyProperties_1 ) || applyProperties$1;
+
 var createElement_1 = createElement;
 
 function createElement(vnode, opts) {
-    var doc = opts ? opts.document || document_1 : document_1;
+    var doc = opts ? opts.document || document$5 : document$5;
     var warn = opts ? opts.warn : null;
 
-    vnode = handleThunk_1(vnode).a;
+    vnode = handleThunk$2(vnode).a;
 
-    if (isWidget_1(vnode)) {
+    if (isWidget$2(vnode)) {
         return vnode.init()
-    } else if (isVtext(vnode)) {
+    } else if (isVText(vnode)) {
         return doc.createTextNode(vnode.text)
-    } else if (!isVnode(vnode)) {
+    } else if (!isVNode(vnode)) {
         if (warn) {
             warn("Item is not a valid virtual dom node", vnode);
         }
@@ -1801,7 +2139,7 @@ function createElement(vnode, opts) {
         doc.createElementNS(vnode.namespace, vnode.tagName);
 
     var props = vnode.properties;
-    applyProperties_1(node, props);
+    applyProperties$2(node, props);
 
     var children = vnode.children;
 
@@ -1814,6 +2152,13 @@ function createElement(vnode, opts) {
 
     return node
 }
+
+
+
+var createElement$1 = Object.freeze({
+	default: createElement_1,
+	__moduleExports: createElement_1
+});
 
 // Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
 // We don't want to read all of the DOM nodes in the tree so we use
@@ -1901,10 +2246,17 @@ function ascending(a, b) {
     return a > b ? 1 : -1
 }
 
+
+
+var domIndex$1 = Object.freeze({
+	default: domIndex_1,
+	__moduleExports: domIndex_1
+});
+
 var updateWidget_1 = updateWidget;
 
 function updateWidget(a, b) {
-    if (isWidget_1(a) && isWidget_1(b)) {
+    if (isWidget$2(a) && isWidget$2(b)) {
         if ("name" in a && "name" in b) {
             return a.id === b.id
         } else {
@@ -1915,31 +2267,40 @@ function updateWidget(a, b) {
     return false
 }
 
+
+
+var updateWidget$1 = Object.freeze({
+	default: updateWidget_1,
+	__moduleExports: updateWidget_1
+});
+
+var updateWidget$2 = ( updateWidget$1 && updateWidget_1 ) || updateWidget$1;
+
 var patchOp = applyPatch$1;
 
-function applyPatch$1(vpatch$$2, domNode, renderOptions) {
-    var type = vpatch$$2.type;
-    var vNode = vpatch$$2.vNode;
-    var patch = vpatch$$2.patch;
+function applyPatch$1(vpatch, domNode, renderOptions) {
+    var type = vpatch.type;
+    var vNode = vpatch.vNode;
+    var patch = vpatch.patch;
 
     switch (type) {
-        case vpatch.REMOVE:
+        case VPatch.REMOVE:
             return removeNode(domNode, vNode)
-        case vpatch.INSERT:
+        case VPatch.INSERT:
             return insertNode(domNode, patch, renderOptions)
-        case vpatch.VTEXT:
+        case VPatch.VTEXT:
             return stringPatch(domNode, vNode, patch, renderOptions)
-        case vpatch.WIDGET:
+        case VPatch.WIDGET:
             return widgetPatch(domNode, vNode, patch, renderOptions)
-        case vpatch.VNODE:
+        case VPatch.VNODE:
             return vNodePatch(domNode, vNode, patch, renderOptions)
-        case vpatch.ORDER:
+        case VPatch.ORDER:
             reorderChildren(domNode, patch);
             return domNode
-        case vpatch.PROPS:
-            applyProperties_1(domNode, patch, vNode.properties);
+        case VPatch.PROPS:
+            applyProperties$2(domNode, patch, vNode.properties);
             return domNode
-        case vpatch.THUNK:
+        case VPatch.THUNK:
             return replaceRoot(domNode,
                 renderOptions.patch(domNode, patch, renderOptions))
         default:
@@ -1988,7 +2349,7 @@ function stringPatch(domNode, leftVNode, vText, renderOptions) {
 }
 
 function widgetPatch(domNode, leftVNode, widget, renderOptions) {
-    var updating = updateWidget_1(leftVNode, widget);
+    var updating = updateWidget$2(leftVNode, widget);
     var newNode;
 
     if (updating) {
@@ -2022,7 +2383,7 @@ function vNodePatch(domNode, leftVNode, vNode, renderOptions) {
 }
 
 function destroyWidget(domNode, w) {
-    if (typeof w.destroy === "function" && isWidget_1(w)) {
+    if (typeof w.destroy === "function" && isWidget$2(w)) {
         w.destroy(domNode);
     }
 }
@@ -2060,14 +2421,27 @@ function replaceRoot(oldRoot, newRoot) {
     return newRoot;
 }
 
-var patch_1$2 = patch;
 
-function patch(rootNode, patches, renderOptions) {
+
+var patchOp$2 = Object.freeze({
+	default: patchOp,
+	__moduleExports: patchOp
+});
+
+var createElement$2 = ( createElement$1 && createElement_1 ) || createElement$1;
+
+var domIndex$2 = ( domIndex$1 && domIndex_1 ) || domIndex$1;
+
+var patchOp$3 = ( patchOp$2 && patchOp ) || patchOp$2;
+
+var patch_1$2 = patch$1;
+
+function patch$1(rootNode, patches, renderOptions) {
     renderOptions = renderOptions || {};
-    renderOptions.patch = renderOptions.patch && renderOptions.patch !== patch
+    renderOptions.patch = renderOptions.patch && renderOptions.patch !== patch$1
         ? renderOptions.patch
         : patchRecursive;
-    renderOptions.render = renderOptions.render || createElement_1;
+    renderOptions.render = renderOptions.render || createElement$2;
 
     return renderOptions.patch(rootNode, patches, renderOptions)
 }
@@ -2079,10 +2453,10 @@ function patchRecursive(rootNode, patches, renderOptions) {
         return rootNode
     }
 
-    var index = domIndex_1(rootNode, patches.a, indices);
+    var index = domIndex$2(rootNode, patches.a, indices);
     var ownerDocument = rootNode.ownerDocument;
 
-    if (!renderOptions.document && ownerDocument !== document_1) {
+    if (!renderOptions.document && ownerDocument !== document$5) {
         renderOptions.document = ownerDocument;
     }
 
@@ -2104,16 +2478,16 @@ function applyPatch(rootNode, domNode, patchList, renderOptions) {
 
     var newNode;
 
-    if (xIsArray(patchList)) {
+    if (isArray$1(patchList)) {
         for (var i = 0; i < patchList.length; i++) {
-            newNode = patchOp(patchList[i], domNode, renderOptions);
+            newNode = patchOp$3(patchList[i], domNode, renderOptions);
 
             if (domNode === rootNode) {
                 rootNode = newNode;
             }
         }
     } else {
-        newNode = patchOp(patchList, domNode, renderOptions);
+        newNode = patchOp$3(patchList, domNode, renderOptions);
 
         if (domNode === rootNode) {
             rootNode = newNode;
@@ -2135,36 +2509,69 @@ function patchIndices(patches) {
     return indices
 }
 
-var patch_1 = patch_1$2;
 
-var createElement_1$2 = createElement_1;
 
-const $$counter = $$(1).tag('counter');
+var patch$2 = Object.freeze({
+	default: patch_1$2,
+	__moduleExports: patch_1$2
+});
 
-const $$view = $$(function ([counter]) {
-  return h_1('h1.counter', 'counter: ' + counter);
-}, [$$counter]);
+var patch$3 = ( patch$2 && patch_1$2 ) || patch$2;
 
-const mount = function ($$view, container) {
-  // maybe $$view is a getter, just access it once
-  let oldVnode = $$view.val();
-  let rootNode = createElement_1$2(oldVnode);
+var patch_1 = patch$3;
+
+
+
+var patch = Object.freeze({
+	default: patch_1,
+	__moduleExports: patch_1
+});
+
+var createElement_1$2 = createElement$2;
+
+
+
+var createElement$3 = Object.freeze({
+	default: createElement_1$2,
+	__moduleExports: createElement_1$2
+});
+
+var h$3 = ( h && h_1 ) || h;
+
+var diff$4 = ( diff && diff_1 ) || diff;
+
+var patch$4 = ( patch && patch_1 ) || patch;
+
+var createElement$4 = ( createElement$3 && createElement_1$2 ) || createElement$3;
+
+const { Slot } = rimple;
+
+const counterSlot = Slot(1).tag('counter');
+
+const viewSlot = Slot(function ([counter]) {
+  return h$3('h1.counter', 'counter: ' + counter);
+}, [counterSlot]);
+
+const mount = function (viewSlot, container) {
+  // maybe viewSlot is a getter, just access it once
+  let oldVnode = viewSlot.val();
+  let rootNode = createElement$4(oldVnode);
   if (typeof container === 'string') {
     container = document.querySelector(container);
   }
   container.innerHTML = '';
   container.appendChild(rootNode);
   let onChange = function (vnode) {
-    rootNode = patch_1(rootNode, diff_1(oldVnode, vnode));
+    rootNode = patch$4(rootNode, diff$4(oldVnode, vnode));
     oldVnode = vnode;
   };
-  $$view.change(onChange);
+  viewSlot.change(onChange);
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-  mount($$view, '.container');
+  mount(viewSlot, '.container');
   setInterval(function () {
-    $$counter.inc();
+    counterSlot.inc();
   }, 1000);
 });
 

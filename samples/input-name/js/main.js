@@ -1,8 +1,9 @@
 const { h, diff, patch, create } = require('virtual-dom');
+const { Slot } = rimple;
 
-const mount = function ($$view, container) {
-  // maybe $$view is a getter, just access it once
-  let oldVnode = $$view.val();
+const mount = function (viewSlot, container) {
+  // maybe viewSlot is a getter, just access it once
+  let oldVnode = viewSlot.val();
   let rootNode = create(oldVnode);
   if (typeof container === 'string') {
     container = document.querySelector(container);
@@ -13,36 +14,36 @@ const mount = function ($$view, container) {
     rootNode = patch(rootNode, diff(oldVnode, vnode));
     oldVnode = vnode;
   };
-  $$view.change(onChange);
+  viewSlot.change(onChange);
 };
 
-const $$username = $$({
+const usernameSlot = Slot({
   firstName: '',
   lastName: '',
 });
 
-$$username.debug = true;
+usernameSlot.debug = true;
 
-const $$inputs = $$username.fork(function ({ firstName, lastName }) {
+const inputElSlot = usernameSlot.fork(function ({ firstName, lastName }) {
   return h('.inputs', [
     h('input', {
       placeholder: 'input your first name',
       value: firstName,
       oninput() {
-        $$username.patch({ firstName: this.value });
+        usernameSlot.patch({ firstName: this.value });
       }
     }),
     h('input', {
       placeholder: 'input your last name',
       value: lastName,
       oninput() {
-        $$username.patch({ lastName: this.value });
+        usernameSlot.patch({ lastName: this.value });
       }
     }),
   ]);
 });
 
-const $$yourNameEl = $$username.fork(function ({ firstName, lastName }) {
+const yourNameElSlot = usernameSlot.fork(function ({ firstName, lastName }) {
   return h('h2', [
     'your name is: ',
     h('span.fullname', {
@@ -53,10 +54,10 @@ const $$yourNameEl = $$username.fork(function ({ firstName, lastName }) {
   ]);
 });
 
-const $$view = $$(function ([inputs, yourNameEl]) {
+const viewSlot = Slot(function ([inputs, yourNameEl]) {
   return h('div', [ inputs, yourNameEl ]);
-}, [$$inputs, $$yourNameEl]);
+}, [inputElSlot, yourNameElSlot]);
 
 document.addEventListener('DOMContentLoaded', function () {
-  mount($$view, '.container');
+  mount(viewSlot, '.container');
 });

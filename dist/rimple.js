@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define('$$', factory) :
-	(global.$$ = factory());
+	typeof define === 'function' && define.amd ? define('rimple', factory) :
+	(global.rimple = factory());
 }(this, (function () { 'use strict';
 
 /**
@@ -752,9 +752,9 @@ Slot.prototype._propogate = function (_ref) {
     this._setupOffsprings();
   }
   var cleanSlots = {};
-  // update root is always considered to be dirty,
+  // mutate root is always considered to be dirty,
   // otherwise it won't propogate
-  var updateRoot = this;
+  var mutateRoot = this;
   var changeCbArgs = [];
   var _iteratorNormalCompletion2 = true;
   var _didIteratorError2 = false;
@@ -772,7 +772,7 @@ Slot.prototype._propogate = function (_ref) {
           var follower = _step4.value;
 
           var involved = follower._followings.filter(function (following) {
-            return following instanceof Slot && (following._id === updateRoot._id || updateRoot._offspringMap[following._id] && !cleanSlots[following._id]);
+            return following instanceof Slot && (following._id === mutateRoot._id || mutateRoot._offspringMap[following._id] && !cleanSlots[following._id]);
           });
           // clean follower will be untouched
           var dirty = involved.length > 0;
@@ -881,7 +881,7 @@ Slot.prototype.setV = function setV(newV) {
   if (typeof this._mutationTester === 'function' && !this._mutationTester(this.value, newV)) {
     return this;
   }
-  this.debug && console.info('slot: slot ' + this._tag + ' updated -- ', this.value, '->', newV);
+  this.debug && console.info('slot: slot ' + this._tag + ' mutated -- ', this.value, '->', newV);
   var oldV = this._value;
   this._value = newV;
   this._propogate({ roots: [this] });
@@ -1285,7 +1285,7 @@ Slot.prototype.shrink = function (val) {
 };
 
 /**
- * update a group of slots by applying functions upon them, and starts a
+ * mutate a group of slots by applying functions upon them, and starts a
  * *mutation proccess* whose roots are these slots to be changed
  *
  * @example
@@ -1297,7 +1297,7 @@ Slot.prototype.shrink = function (val) {
  *   console.log(involved.map(it => it.tag())); // p1, p2, p3
  *   return p1 + p2 + p3;
  * }, [$$p1, $$p2, $$p3]);
- * $$.applyWith([
+ * $$.mutateWith([
  *   [$$p1, n => n + 1],
  *   [$$p2, n => n + 2],
  * ]);
@@ -1307,8 +1307,8 @@ Slot.prototype.shrink = function (val) {
  * a Slot, and second is the function to be applied
  *
  * */
-var applyWith = function applyWith(slotFnPairs) {
-  return update(slotFnPairs.map(function (_ref7) {
+var mutateWith = function mutateWith(slotFnPairs) {
+  return mutate(slotFnPairs.map(function (_ref7) {
     var _ref8 = _slicedToArray(_ref7, 2),
         slot = _ref8[0],
         fn = _ref8[1];
@@ -1318,7 +1318,7 @@ var applyWith = function applyWith(slotFnPairs) {
 };
 
 /**
- * update a group of slots, and starts a *mutation proccess* whose
+ * mutate a group of slots, and starts a *mutation proccess* whose
  * roots are these slots to be changed
  *
  * @example
@@ -1330,7 +1330,7 @@ var applyWith = function applyWith(slotFnPairs) {
  *   console.log(involved.map(it => it.tag())); // p1, p2, p3
  *   return p1 + p2 + p3;
  * }, [$$p1, $$p2, $$p3]);
- * $$.applyWith([
+ * $$.mutate([
  *   [$$p1, 2],
  *   [$$p2, 4],
  * ]);
@@ -1340,7 +1340,7 @@ var applyWith = function applyWith(slotFnPairs) {
  * a Slot, and second is the new value of slots
  *
  * */
-var update = function update(slotValuePairs) {
+var mutate = function mutate(slotValuePairs) {
   var cleanSlots = {};
   var roots = slotValuePairs.map(function (_ref9) {
     var _ref10 = _slicedToArray(_ref9, 1),
@@ -1348,7 +1348,7 @@ var update = function update(slotValuePairs) {
 
     return slot;
   });
-  // update the targets directly
+  // mutate the targets directly
   slotValuePairs.forEach(function (_ref11) {
     var _ref12 = _slicedToArray(_ref11, 2),
         slot = _ref12[0],
@@ -1415,7 +1415,7 @@ var update = function update(slotValuePairs) {
       addToRelatedSlots(offspring, level);
     });
   });
-  // group _offspringMap by level, but omits level 0 (those updated directly)
+  // group _offspringMap by level, but omits level 0 (those mutated directly)
   // since they have been touched
   var slots = void 0;
   var levels = [];
@@ -1538,7 +1538,7 @@ var update = function update(slotValuePairs) {
  *
  * @example
  * const $$s = $$(1);
- * $$s.applyWith(function (s, n) {
+ * $$s.mutateWith(function (s, n) {
  *  return s + n;
  * }, [2]);
  * console.log($$s.val()); // output 3
@@ -1554,7 +1554,7 @@ var update = function update(slotValuePairs) {
  * @return {Slot} this
  *
  * */
-Slot.prototype.applyWith = function applyWith(func) {
+Slot.prototype.mutateWith = function mutateWith(func) {
   var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
   args = [this._value].concat(args);
@@ -1580,27 +1580,20 @@ var mixin = function mixin(mixins) {
   Object.assign(Slot.prototype, mixins);
 };
 
-var index = (function ($$) {
-  $$.Slot = Slot;
-  $$.slot = function () {
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
-    }
+mixin(booleanOps);
+mixin(objectOps);
+mixin(numberOps);
+mixin(listOps);
 
-    return new Slot(args);
-  };
-  $$.update = update;
-  $$.applyWith = applyWith;
-  $$.mixin = mixin;
-  $$.mixin(booleanOps);
-  $$.mixin(objectOps);
-  $$.mixin(numberOps);
-  $$.mixin(listOps);
-  return $$;
-})(Slot);
+var index = {
+  Slot: Slot,
+  mutate: mutate,
+  mutateWith: mutateWith,
+  mixin: mixin
+};
 
 return index;
 
 })));
 
-//# sourceMappingURL=ripple.js.map
+//# sourceMappingURL=rimple.js.map

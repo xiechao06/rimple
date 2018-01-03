@@ -200,200 +200,6 @@ $$a.inc();</code></pre></li>
     
 
     
-    <h4 class="name" id="applyWith"><span class="type-signature"></span>applyWith<span class="signature">(func, args)</span><span class="type-signature"> &rarr; {<a href="Slot.html">Slot</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>apply the function to me</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>func</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>the mutation function</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>args</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>the extra arguments provided to func, default is []</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line794">line 794</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>this</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Slot.html">Slot</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-    <pre class="prettyprint"><code>const $$s = $$(1);
-$$s.applyWith(function (s, n) {
- return s + n;
-}, [2]);
-console.log($$s.val()); // output 3
-
-is equivalent to</code></pre>
-
-    <pre class="prettyprint"><code>const $$s = $$(1);
-$$s.val(function (s, n) { return s + n; }($$s.val(), 2));</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="change"><span class="type-signature"></span>change<span class="signature">(proc)</span><span class="type-signature"> &rarr; {<a href="Slot.html">Slot</a>}</span></h4>
     
 
@@ -2278,6 +2084,200 @@ console.log($$s.val());  // output 3</code></pre>
     
 
 
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="mutateWith"><span class="type-signature"></span>mutateWith<span class="signature">(func, args)</span><span class="type-signature"> &rarr; {<a href="Slot.html">Slot</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>apply the function to me</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the mutation function</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the extra arguments provided to func, default is []</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line794">line 794</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Slot.html">Slot</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>const $$s = $$(1);
+$$s.mutateWith(function (s, n) {
+ return s + n;
+}, [2]);
+console.log($$s.val()); // output 3
+
+is equivalent to</code></pre>
+
+    <pre class="prettyprint"><code>const $$s = $$(1);
+$$s.val(function (s, n) { return s + n; }($$s.val(), 2));</code></pre>
 
 
 
@@ -5255,13 +5255,13 @@ otherwise, set the value of Slot, <em>the mutation process</em> starts, and retu
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Slot.html">Slot</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyWith">applyWith</a></li><li><a href="global.html#mixin">mixin</a></li><li><a href="global.html#update">update</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Slot.html">Slot</a></li></ul><h3>Global</h3><ul><li><a href="global.html#mixin">mixin</a></li><li><a href="global.html#mutate">mutate</a></li><li><a href="global.html#mutateWith">mutateWith</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jan 02 2018 20:42:23 GMT+0800 (CST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 03 2018 15:25:39 GMT+0800 (CST)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,6 +1,6 @@
 {
     "globals": {
-        "$$": true,
+        "rimple": true,
         "Navigo": true,
         "R": true,
         "chance": true

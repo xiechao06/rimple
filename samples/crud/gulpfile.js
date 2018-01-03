@@ -7,6 +7,7 @@ const rollup = require('gulp-better-rollup');
 const nodeResolve = require('rollup-plugin-node-resolve');
 const commonjs = require('rollup-plugin-commonjs');
 const json = require('rollup-plugin-json');
+const fs = require('fs');
 
 gulp.task('connect', function () {
   portfinder.getPort(function (err, port) {
@@ -35,13 +36,15 @@ gulp.task('watch', function () {
 });
 
 gulp.task('link', function (cb) {
-  exec('ln -sf ../../../dist/rimple.js ./js/rimple.js', (err) => {
+  fs.access('../../../dist/rimple.js', fs.constants.R_OK, (err) => {
     if (err) {
       console.log('please run npm build in package root directory!');
       return;
     }
-    exec('ln -sf ../../../dist/rimple.js.map ./js/rimple.js.map', () => {
-      cb();
+    exec('ln -sf ../../../dist/rimple.js ./js/rimple.js', () => {
+      exec('ln -sf ../../../dist/rimple.js.map ./js/rimple.js.map', () => {
+        cb();
+      });
     });
   });
 });

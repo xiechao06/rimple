@@ -3,15 +3,17 @@ const diff = require('virtual-dom/diff');
 const patch = require('virtual-dom/patch');
 const createElement = require('virtual-dom/create-element');
 
-const $$counter = $$(1).tag('counter');
+const { Slot } = rimple;
 
-const $$view = $$(function ([counter]) {
+const counterSlot = Slot(1).tag('counter');
+
+const viewSlot = Slot(function ([counter]) {
   return h('h1.counter', 'counter: ' + counter);
-}, [$$counter]);
+}, [counterSlot]);
 
-const mount = function ($$view, container) {
-  // maybe $$view is a getter, just access it once
-  let oldVnode = $$view.val();
+const mount = function (viewSlot, container) {
+  // maybe viewSlot is a getter, just access it once
+  let oldVnode = viewSlot.val();
   let rootNode = createElement(oldVnode);
   if (typeof container === 'string') {
     container = document.querySelector(container);
@@ -22,12 +24,12 @@ const mount = function ($$view, container) {
     rootNode = patch(rootNode, diff(oldVnode, vnode));
     oldVnode = vnode;
   };
-  $$view.change(onChange);
+  viewSlot.change(onChange);
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-  mount($$view, '.container');
+  mount(viewSlot, '.container');
   setInterval(function () {
-    $$counter.inc();
+    counterSlot.inc();
   }, 1000);
 });

@@ -3,23 +3,25 @@ import countryStore from './store/country';
 import userStore from './store/user';
 import router from './router';
 
-const $$loading = $$('.loading');
-const $$obj = $$({});
-const $$nations = $$([]);
-const $$message = $$('');
+const { Slot } = rimple;
+
+const loadingSlot = Slot('.loading');
+const objSlot = Slot({});
+const nationListSlot = Slot([]);
+const messageSlot = Slot('');
 
 const onsubmit = function onsubmit() {
-  $$loading.val('.loading');
-  let obj = $$obj.val();
+  loadingSlot.val('.loading');
+  let obj = objSlot.val();
   userStore.save(obj)
   .then(function () {
-    $$.update([
-      [$$loading, ''],
-      [$$message, 'submit succeeded!'],
+    rimple.mutate([
+      [loadingSlot, ''],
+      [messageSlot, 'submit succeeded!'],
     ]);
-    $$loading.val('');
+    loadingSlot.val('');
     setTimeout(function () {
-      $$message.val('');
+      messageSlot.val('');
     }, 2000);
     router.navigate('/user/' + obj.id);
   });
@@ -28,7 +30,7 @@ const onsubmit = function onsubmit() {
 
 export default {
   get $$view() {
-    return $$(function ([loading, obj, nations, message]) {
+    return Slot(function ([loading, obj, nations, message]) {
       let { name, age, nation, gender, email } = obj;
       return h('.app' + loading, [
         h('h2', obj.id && 'editing user: ' + obj.name || 'creating user'),
@@ -40,7 +42,7 @@ export default {
             h('label', 'Name'),
             h('input', {
               oninput() {
-                $$obj.patch({ name: this.value });
+                objSlot.patch({ name: this.value });
               },
               value: name
             }),
@@ -49,7 +51,7 @@ export default {
             h('label', 'Age'),
             h('input', {
               oninput() {
-                $$obj.patch({ age: this.value });
+                objSlot.patch({ age: this.value });
               },
               value: age,
               type: 'number'
@@ -64,7 +66,7 @@ export default {
                 male: 'true'
               }[gender],
               onclick() {
-                $$obj.patch({ gender: 'male' });
+                objSlot.patch({ gender: 'male' });
               }
             }),
             h('label', 'male'),
@@ -76,7 +78,7 @@ export default {
                 female: 'true'
               }[gender],
               onclick() {
-                $$obj.patch({ gender: 'female' });
+                objSlot.patch({ gender: 'female' });
               }
             }),
             h('label', 'female'),
@@ -85,7 +87,7 @@ export default {
             h('label', 'nation'),
             h('select', {
               onchange() {
-                $$obj.patch({ nation: this.value });
+                objSlot.patch({ nation: this.value });
               }
             }, [''].concat(nations).map(function (_nation) {
               return h('option', {
@@ -99,7 +101,7 @@ export default {
             h('input', {
               type: 'email',
               oninput() {
-                $$obj.patch({ email: this.value });
+                objSlot.patch({ email: this.value });
               },
               value: email,
             })
@@ -117,7 +119,7 @@ export default {
           }, 'back')
         ]),
       ]);
-    }, [$$loading, $$obj, $$nations, $$message]);
+    }, [loadingSlot, objSlot, nationListSlot, messageSlot]);
   },
   init({ id }={}) {
     Promise.all([
@@ -125,10 +127,10 @@ export default {
       id? userStore.get(id): Promise.resolve({})
     ])
     .then(function ([countries, obj]) {
-      $$.update([
-        [$$loading, ''],
-        [$$nations, countries],
-        [$$obj, obj],
+      rimple.mutate([
+        [loadingSlot, ''],
+        [nationListSlot, countries],
+        [objSlot, obj],
       ]);
     });
 

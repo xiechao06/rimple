@@ -9,5 +9,5 @@ Session.vim
 *~
 
 node_modules/
-samples/**/ripple.js
-samples/**/ripple.js.map
+samples/**/rimple.js
+samples/**/rimple.js.map

@@ -2,7 +2,7 @@
   "name": "rimple",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/ripple.js",
   "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -17,6 +17,7 @@
     "gulp-mocha": "^4.3.0",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^2.6.1",
+    "jsdoc": "^3.5.5",
     "mocha-clean": "^1.0.0",
     "portfinder": "^1.0.13",
     "ramda": "^0.25.0",
@@ -30,6 +31,11 @@
   "scripts": {
     "test": "./node_modules/gulp/bin/gulp.js test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xiechao06/rimple.git"
+  },
   "author": "xiechao06",
-  "license": "ISC"
+  "email": "xiechao06@gmail.com",
+  "license": "MIT"
 }

@@ -349,16 +349,16 @@ Slot.prototype._propogate = function ({ roots }) {
     this._setupOffsprings();
   }
   let cleanSlots = {};
-  // update root is always considered to be dirty,
+  // mutate root is always considered to be dirty,
   // otherwise it won't propogate
-  let updateRoot = this;
+  let mutateRoot = this;
   let changeCbArgs = [];
   for (let level of this._offspringLevels) {
     for (let follower of level) {
       let involved = follower._followings.filter(function (following) {
         return following instanceof Slot &&
-          (following._id === updateRoot._id ||
-           (updateRoot._offspringMap[following._id] && !cleanSlots[following._id]));
+          (following._id === mutateRoot._id ||
+           (mutateRoot._offspringMap[following._id] && !cleanSlots[following._id]));
       });
       // clean follower will be untouched
       let dirty = involved.length > 0;
@@ -416,7 +416,7 @@ Slot.prototype.setV = function setV(newV) {
     return this;
   }
   this.debug && console.info(
-    `slot: slot ${this._tag} updated -- `, this.value, '->', newV
+    `slot: slot ${this._tag} mutated -- `, this.value, '->', newV
   );
   let oldV = this._value;
   this._value = newV;
@@ -630,7 +630,7 @@ Slot.prototype.shrink = function (val) {
 
 
 /**
- * update a group of slots by applying functions upon them, and starts a
+ * mutate a group of slots by applying functions upon them, and starts a
  * *mutation proccess* whose roots are these slots to be changed
  *
  * @example
@@ -642,7 +642,7 @@ Slot.prototype.shrink = function (val) {
  *   console.log(involved.map(it => it.tag())); // p1, p2, p3
  *   return p1 + p2 + p3;
  * }, [$$p1, $$p2, $$p3]);
- * $$.applyWith([
+ * $$.mutateWith([
  *   [$$p1, n => n + 1],
  *   [$$p2, n => n + 2],
  * ]);
@@ -652,14 +652,14 @@ Slot.prototype.shrink = function (val) {
  * a Slot, and second is the function to be applied
  *
  * */
-const applyWith = function (slotFnPairs) {
-  return update(slotFnPairs.map(function ([slot, fn]) {
+const mutateWith = function (slotFnPairs) {
+  return mutate(slotFnPairs.map(function ([slot, fn]) {
     return [slot, fn && fn.apply(slot, [slot.val()])];
   }));
 };
 
 /**
- * update a group of slots, and starts a *mutation proccess* whose
+ * mutate a group of slots, and starts a *mutation proccess* whose
  * roots are these slots to be changed
  *
  * @example
@@ -671,7 +671,7 @@ const applyWith = function (slotFnPairs) {
  *   console.log(involved.map(it => it.tag())); // p1, p2, p3
  *   return p1 + p2 + p3;
  * }, [$$p1, $$p2, $$p3]);
- * $$.applyWith([
+ * $$.mutate([
  *   [$$p1, 2],
  *   [$$p2, 4],
  * ]);
@@ -681,10 +681,10 @@ const applyWith = function (slotFnPairs) {
  * a Slot, and second is the new value of slots
  *
  * */
-const update = function (slotValuePairs) {
+const mutate = function (slotValuePairs) {
   let cleanSlots = {};
   let roots = slotValuePairs.map(([slot]) => slot);
-  // update the targets directly
+  // mutate the targets directly
   slotValuePairs.forEach(function ([slot, value]) {
     slot.debug && console.info(`slot ${slot._tag} mutationTester`, slot._value, value);
     let oldValue = slot._value;
@@ -722,7 +722,7 @@ const update = function (slotValuePairs) {
       addToRelatedSlots(offspring, level);
     });
   });
-  // group _offspringMap by level, but omits level 0 (those updated directly)
+  // group _offspringMap by level, but omits level 0 (those mutated directly)
   // since they have been touched
   let slots;
   let levels = [];
@@ -775,7 +775,7 @@ const update = function (slotValuePairs) {
  *
  * @example
  * const $$s = $$(1);
- * $$s.applyWith(function (s, n) {
+ * $$s.mutateWith(function (s, n) {
  *  return s + n;
  * }, [2]);
  * console.log($$s.val()); // output 3
@@ -791,7 +791,7 @@ const update = function (slotValuePairs) {
  * @return {Slot} this
  *
  * */
-Slot.prototype.applyWith = function applyWith(func, args=[]) {
+Slot.prototype.mutateWith = function mutateWith(func, args=[]) {
   args = [this._value].concat(args);
   return this.val(func.apply(this, args));
 };
@@ -815,17 +815,14 @@ const mixin = function mixin(mixins) {
   Object.assign(Slot.prototype, mixins);
 };
 
-export default (function ($$) {
-  $$.Slot = Slot;
-  $$.slot = function (...args) {
-    return new Slot(args);
-  };
-  $$.update = update;
-  $$.applyWith = applyWith;
-  $$.mixin = mixin;
-  $$.mixin(booleanOps);
-  $$.mixin(objectOps);
-  $$.mixin(numberOps);
-  $$.mixin(listOps);
-  return $$;
-})(Slot);
+mixin(booleanOps);
+mixin(objectOps);
+mixin(numberOps);
+mixin(listOps);
+
+export default {
+  Slot,
+  mutate,
+  mutateWith,
+  mixin,
+};

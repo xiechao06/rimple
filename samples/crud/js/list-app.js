@@ -2,10 +2,11 @@ import { h } from 'virtual-dom';
 import userStore from './store/user';
 import router from './router';
 import qs from 'query-string';
+const { Slot } = rimple;
 
-const $$list = $$([]).tag('list');
-const $$loading = $$('.loading');
-const $$paginator = $$('');
+const listSlot = Slot([]).tag('list');
+const loadingSlot = Slot('.loading');
+const paginatorSlot = Slot('');
 
 const paginator = function ({ page, pageSize, totalCnt }) {
   return h('.paginator', R.range(1, Math.floor((totalCnt - 1) / pageSize) + 2).map(function (idx) {
@@ -22,7 +23,7 @@ const paginator = function ({ page, pageSize, totalCnt }) {
 
 export default {
   get $$view() {
-    return $$(function ([loading, list, paginator]) {
+    return Slot(function ([loading, list, paginator]) {
       return h('.list.app' + loading, [
         h('h2', [
           'list of users',
@@ -57,18 +58,18 @@ export default {
         ]),
         paginator,
       ]);
-    }, [$$loading, $$list, $$paginator])
+    }, [loadingSlot, listSlot, paginatorSlot])
     .tag('list-view');
   },
   onMount() {
     let { page=1, pageSize=16 } = qs.parse(location.search);
-    $$loading.val('.loading');
+    loadingSlot.val('.loading');
     userStore.fetchList({ page, pageSize })
     .then(function ({ totalCnt, data }) {
-      $$.update([
-        [$$loading, ''],
-        [$$list, data],
-        [$$paginator, paginator({ page, pageSize, totalCnt })]
+      rimple.mutate([
+        [loadingSlot, ''],
+        [listSlot, data],
+        [paginatorSlot, paginator({ page, pageSize, totalCnt })]
       ]);
     });
   }

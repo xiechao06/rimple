@@ -5,8 +5,9 @@ const { argv } = require('yargs');
 const sourcemaps = require('gulp-sourcemaps');
 const babel = require('rollup-plugin-babel');
 const minify = require('rollup-plugin-babel-minify');
-const { production } = require('gulp-environments');
+const environments = require('gulp-environments');
 const { exec } = require('child_process');
+const del = require('del');
 
 gulp.task('doc', function (cb) {
   exec('node_modules/jsdoc/jsdoc.js README.md index.js op/*.js -c ./.jsdoc.json -d docs', () => {
@@ -14,7 +15,12 @@ gulp.task('doc', function (cb) {
   });
 });
 
-gulp.task('build', function () {
+gulp.task('build-min', function () {
+  environments.current(environments.production);
+  return build();
+});
+
+const build = function build () {
   return gulp.src('index.js')
   .pipe(sourcemaps.init())
   .pipe(rollup({
@@ -27,22 +33,23 @@ gulp.task('build', function () {
               browsers: ['last 2 versions', 'ie 8'],
             },
             modules: false,
-            minify: true,
             forceAllTransforms: true,
           }],
         ],
+        comments: !environments.production(),
       }),
-      ...(production()? [minify()]: [])
+      ...(environments.production()? [minify()]: [])
     ]
   }, {
-    file: production()? 'ripple.min.js': 'ripple.js',
+    file: environments.production()? 'rimple.min.js': 'rimple.js',
     format: 'umd',
-    // moduleId: '$$',
-    name: '$$'
+    name: 'rimple'
   }))
   .pipe(sourcemaps.write('./'))
   .pipe(gulp.dest('./dist'));
-});
+};
+
+gulp.task('build', build);
 
 gulp.task('test', ['build'], function () {
   let args = {
@@ -62,6 +69,13 @@ gulp.task('watch', function () {
 
 gulp.task('watch-doc', function () {
   gulp.watch(['index.js', 'op/*.js'], ['doc']);
+});
+
+// call this task before every commit
+gulp.task('pre-commit', ['doc', 'build', 'build-min']);
+
+gulp.task('clean', function () {
+  return del(['./docs', './dist']);
 });
 
 gulp.task('default', ['test', 'watch']);

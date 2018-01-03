@@ -1,17 +1,17 @@
 import Countries from 'country-list';
 
-const users = R.range(0, 16*4).map(function (idx) {
-  return {
-    id: idx + 1,
-    name: chance.name(),
-    age: '' + chance.age(),
-    gender: chance.pick(['male', 'female']),
-    nation: chance.pick(new Countries().getNames()),
-    email: chance.email(),
-  };
-});
-
 if (!sessionStorage.getItem('users')) {
+  let users = R.range(0, 16*4).map(function (idx) {
+    return {
+      id: idx + 1,
+      name: chance.name(),
+      age: '' + chance.age(),
+      gender: chance.pick(['male', 'female']),
+      nation: chance.pick(new Countries().getNames()),
+      email: chance.email(),
+    };
+  });
+
   sessionStorage.setItem('users', JSON.stringify(users));
 }
 
@@ -25,10 +25,11 @@ export default {
     });
   },
   fetchList({ page, pageSize }) {
+    let users = JSON.parse(sessionStorage.getItem('users'));
     return new Promise(function (resolve) {
       setTimeout(function () {
         resolve({
-          data: JSON.parse(sessionStorage.getItem('users')).reverse()
+          data: users.reverse()
           .slice( (page - 1) * pageSize, page * pageSize ),
           totalCnt: users.length,
         });

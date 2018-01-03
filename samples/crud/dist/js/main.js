@@ -1058,18 +1058,18 @@ CountryList.prototype.getData = function getData () {
   return data$2
 };
 
-const users = R.range(0, 16*4).map(function (idx) {
-  return {
-    id: idx + 1,
-    name: chance.name(),
-    age: '' + chance.age(),
-    gender: chance.pick(['male', 'female']),
-    nation: chance.pick(new countryList().getNames()),
-    email: chance.email(),
-  };
-});
-
 if (!sessionStorage.getItem('users')) {
+  let users = R.range(0, 16*4).map(function (idx) {
+    return {
+      id: idx + 1,
+      name: chance.name(),
+      age: '' + chance.age(),
+      gender: chance.pick(['male', 'female']),
+      nation: chance.pick(new countryList().getNames()),
+      email: chance.email(),
+    };
+  });
+
   sessionStorage.setItem('users', JSON.stringify(users));
 }
 
@@ -1083,10 +1083,11 @@ var userStore = {
     });
   },
   fetchList({ page, pageSize }) {
+    let users = JSON.parse(sessionStorage.getItem('users'));
     return new Promise(function (resolve) {
       setTimeout(function () {
         resolve({
-          data: JSON.parse(sessionStorage.getItem('users')).reverse()
+          data: users.reverse()
           .slice( (page - 1) * pageSize, page * pageSize ),
           totalCnt: users.length,
         });
@@ -1121,11 +1122,18 @@ var userStore = {
 const router = new Navigo(null);
 
 'use strict';
-var strictUriEncode = function (str) {
+var _1_1_0_strictUriEncode = function (str) {
 	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
 		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
 	});
 };
+
+
+
+var _1_1_0_strictUriEncode$2 = Object.freeze({
+	default: _1_1_0_strictUriEncode,
+	__moduleExports: _1_1_0_strictUriEncode
+});
 
 /*
 object-assign
@@ -1191,7 +1199,7 @@ function shouldUseNative() {
 	}
 }
 
-var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
+var _4_1_1_objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
 	var from;
 	var to = toObject(target);
 	var symbols;
@@ -1217,6 +1225,13 @@ var objectAssign = shouldUseNative() ? Object.assign : function (target, source)
 
 	return to;
 };
+
+
+
+var _4_1_1_objectAssign$2 = Object.freeze({
+	default: _4_1_1_objectAssign,
+	__moduleExports: _4_1_1_objectAssign
+});
 
 'use strict';
 var token = '%[a-f0-9]{2}';
@@ -1297,7 +1312,7 @@ function customDecodeURIComponent(input) {
 	return input;
 }
 
-var decodeUriComponent = function (encodedURI) {
+var _0_2_0_decodeUriComponent = function (encodedURI) {
 	if (typeof encodedURI !== 'string') {
 		throw new TypeError('Expected `encodedURI` to be of type `string`, got `' + typeof encodedURI + '`');
 	}
@@ -1312,6 +1327,19 @@ var decodeUriComponent = function (encodedURI) {
 		return customDecodeURIComponent(encodedURI);
 	}
 };
+
+
+
+var _0_2_0_decodeUriComponent$2 = Object.freeze({
+	default: _0_2_0_decodeUriComponent,
+	__moduleExports: _0_2_0_decodeUriComponent
+});
+
+var strictUriEncode = ( _1_1_0_strictUriEncode$2 && _1_1_0_strictUriEncode ) || _1_1_0_strictUriEncode$2;
+
+var objectAssign = ( _4_1_1_objectAssign$2 && _4_1_1_objectAssign ) || _4_1_1_objectAssign$2;
+
+var decodeComponent = ( _0_2_0_decodeUriComponent$2 && _0_2_0_decodeUriComponent ) || _0_2_0_decodeUriComponent$2;
 
 'use strict';
 
@@ -1464,9 +1492,9 @@ var parse = function (str, opts) {
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeUriComponent(val);
+		val = val === undefined ? null : decodeComponent(val);
 
-		formatter(decodeUriComponent(key), val, ret);
+		formatter(decodeComponent(key), val, ret);
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {
@@ -1524,15 +1552,17 @@ var stringify = function (obj, opts) {
 	}).join('&') : '';
 };
 
-var queryString = {
+var _5_0_1_queryString = {
 	extract: extract,
 	parse: parse,
 	stringify: stringify
 };
 
-const $$list = $$([]).tag('list');
-const $$loading = $$('.loading');
-const $$paginator = $$('');
+const { Slot } = rimple;
+
+const listSlot = Slot([]).tag('list');
+const loadingSlot = Slot('.loading');
+const paginatorSlot = Slot('');
 
 const paginator = function ({ page, pageSize, totalCnt }) {
   return virtualDom.h('.paginator', R.range(1, Math.floor((totalCnt - 1) / pageSize) + 2).map(function (idx) {
@@ -1549,7 +1579,7 @@ const paginator = function ({ page, pageSize, totalCnt }) {
 
 var listApp = {
   get $$view() {
-    return $$(function ([loading, list, paginator]) {
+    return Slot(function ([loading, list, paginator]) {
       return virtualDom.h('.list.app' + loading, [
         virtualDom.h('h2', [
           'list of users',
@@ -1584,18 +1614,18 @@ var listApp = {
         ]),
         paginator,
       ]);
-    }, [$$loading, $$list, $$paginator])
+    }, [loadingSlot, listSlot, paginatorSlot])
     .tag('list-view');
   },
   onMount() {
-    let { page=1, pageSize=16 } = queryString.parse(location.search);
-    $$loading.val('.loading');
+    let { page=1, pageSize=16 } = _5_0_1_queryString.parse(location.search);
+    loadingSlot.val('.loading');
     userStore.fetchList({ page, pageSize })
     .then(function ({ totalCnt, data }) {
-      $$.update([
-        [$$loading, ''],
-        [$$list, data],
-        [$$paginator, paginator({ page, pageSize, totalCnt })]
+      rimple.mutate([
+        [loadingSlot, ''],
+        [listSlot, data],
+        [paginatorSlot, paginator({ page, pageSize, totalCnt })]
       ]);
     });
   }
@@ -1611,23 +1641,25 @@ var countryStore = {
   }
 };
 
-const $$loading$1 = $$('.loading');
-const $$obj = $$({});
-const $$nations = $$([]);
-const $$message = $$('');
+const { Slot: Slot$1 } = rimple;
+
+const loadingSlot$1 = Slot$1('.loading');
+const objSlot = Slot$1({});
+const nationListSlot = Slot$1([]);
+const messageSlot = Slot$1('');
 
 const onsubmit = function onsubmit() {
-  $$loading$1.val('.loading');
-  let obj = $$obj.val();
+  loadingSlot$1.val('.loading');
+  let obj = objSlot.val();
   userStore.save(obj)
   .then(function () {
-    $$.update([
-      [$$loading$1, ''],
-      [$$message, 'submit succeeded!'],
+    rimple.mutate([
+      [loadingSlot$1, ''],
+      [messageSlot, 'submit succeeded!'],
     ]);
-    $$loading$1.val('');
+    loadingSlot$1.val('');
     setTimeout(function () {
-      $$message.val('');
+      messageSlot.val('');
     }, 2000);
     router.navigate('/user/' + obj.id);
   });
@@ -1636,7 +1668,7 @@ const onsubmit = function onsubmit() {
 
 var objectApp = {
   get $$view() {
-    return $$(function ([loading, obj, nations, message]) {
+    return Slot$1(function ([loading, obj, nations, message]) {
       let { name, age, nation, gender, email } = obj;
       return virtualDom.h('.app' + loading, [
         virtualDom.h('h2', obj.id && 'editing user: ' + obj.name || 'creating user'),
@@ -1648,7 +1680,7 @@ var objectApp = {
             virtualDom.h('label', 'Name'),
             virtualDom.h('input', {
               oninput() {
-                $$obj.patch({ name: this.value });
+                objSlot.patch({ name: this.value });
               },
               value: name
             }),
@@ -1657,7 +1689,7 @@ var objectApp = {
             virtualDom.h('label', 'Age'),
             virtualDom.h('input', {
               oninput() {
-                $$obj.patch({ age: this.value });
+                objSlot.patch({ age: this.value });
               },
               value: age,
               type: 'number'
@@ -1672,7 +1704,7 @@ var objectApp = {
                 male: 'true'
               }[gender],
               onclick() {
-                $$obj.patch({ gender: 'male' });
+                objSlot.patch({ gender: 'male' });
               }
             }),
             virtualDom.h('label', 'male'),
@@ -1684,7 +1716,7 @@ var objectApp = {
                 female: 'true'
               }[gender],
               onclick() {
-                $$obj.patch({ gender: 'female' });
+                objSlot.patch({ gender: 'female' });
               }
             }),
             virtualDom.h('label', 'female'),
@@ -1693,7 +1725,7 @@ var objectApp = {
             virtualDom.h('label', 'nation'),
             virtualDom.h('select', {
               onchange() {
-                $$obj.patch({ nation: this.value });
+                objSlot.patch({ nation: this.value });
               }
             }, [''].concat(nations).map(function (_nation) {
               return virtualDom.h('option', {
@@ -1707,7 +1739,7 @@ var objectApp = {
             virtualDom.h('input', {
               type: 'email',
               oninput() {
-                $$obj.patch({ email: this.value });
+                objSlot.patch({ email: this.value });
               },
               value: email,
             })
@@ -1725,7 +1757,7 @@ var objectApp = {
           }, 'back')
         ]),
       ]);
-    }, [$$loading$1, $$obj, $$nations, $$message]);
+    }, [loadingSlot$1, objSlot, nationListSlot, messageSlot]);
   },
   init({ id }={}) {
     Promise.all([
@@ -1733,10 +1765,10 @@ var objectApp = {
       id? userStore.get(id): Promise.resolve({})
     ])
     .then(function ([countries, obj]) {
-      $$.update([
-        [$$loading$1, ''],
-        [$$nations, countries],
-        [$$obj, obj],
+      rimple.mutate([
+        [loadingSlot$1, ''],
+        [nationListSlot, countries],
+        [objSlot, obj],
       ]);
     });
 
