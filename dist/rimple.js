@@ -440,8 +440,8 @@ var _objectValues = function _objectValues(obj) {
  *
  *  ```javascript
  *
- *  const $$following = $$(1);
- *  const $$follower = $$((following, n) => following + n, [$$following, 2]);
+ *  const $$following = Slot(1);
+ *  const $$follower = Slot((following, n) => following + n, [$$following, 2]);
  *  console.log($$follower.val()); // output 3, since n is always 2
  *
  *  $$following.inc();
@@ -450,10 +450,10 @@ var _objectValues = function _objectValues(obj) {
  *
  *  ```javascript
  *
- *  const $$a = $$(1).tag('a');
- *  const $$b = $$(([a]) => a + 1, [$$a]).tag('b');
- *  const $$c = $$(2).tag('c');
- *  const $$d = $$(function ([a, b], {roots, involved}) {
+ *  const $$a = Slot(1).tag('a');
+ *  const $$b = Slot(([a]) => a + 1, [$$a]).tag('b');
+ *  const $$c = Slot(2).tag('c');
+ *  const $$d = Slot(function ([a, b], {roots, involved}) {
  *    console.log(roots.map(it => it.tag())); // output [a]
  *    console.log(involved.map(it => it.tag())); // output [b]
  *    return a + b;
@@ -520,7 +520,7 @@ Slot.prototype.isTopmost = function isTopmost() {
  *
  * @example
  * // set tag will return this
- * const $$s = $$('foo').tag('bar');
+ * const $$s = Slot('foo').tag('bar');
  * console.log($$s.tag()); // output bar
  *
  * @param {(string|undefined)} v - if is string, set the tag of slot and return this,
@@ -539,10 +539,10 @@ Slot.prototype.tag = function tag(v) {
  * set a handler to Slot to test if slot is mutated, here is an example:
  *
  * @example
- * let $$s1 = $$(true);
- * let $$s2 = $$(false);
+ * let $$s1 = Slot(true);
+ * let $$s2 = Slot(false);
  *
- * let $$s3 = $$((s1, s2) => s1 && s2, [$$s1, $$s2])
+ * let $$s3 = Slot((s1, s2) => s1 && s2, [$$s1, $$s2])
  * .mutationTester((oldV, newV) => oldV != newV);
  *
  * $$s4 = $$s3.makeFollower((s3) => !s3)
@@ -576,7 +576,7 @@ Slot.prototype.mutationTester = function mutationTester(tester) {
  * change handler, consider the following scenario:
  *
  * ```javascript
- *  let $$s1 = $$(1);
+ *  let $$s1 = Slot(1);
  *  let $$s2 = $$s1.makeFollower(it => it * 2);
  *  let $$s3 = $$s1.makeFollower(it => it * 3);
  *  $$s2.change(function () {
@@ -1092,14 +1092,14 @@ Slot.prototype.touch = function () {
 /**
  * make a follower slot of me. this following has only one followings it is me.
  * @example
- * const $$s1 = $$(1);
+ * const $$s1 = Slot(1);
  * const $$s2 = $$s1.fork(n => n + 1);
  *
  * is equivalent to:
  *
  * @example
- * const $$s1 = $$(1);
- * const $$s2 = $$(([n]) => n + 1, [$$s1]);
+ * const $$s1 = Slot(1);
+ * const $$s2 = Slot(([n]) => n + 1, [$$s1]);
  *
  * @param {function} func - the evaluation function
  * */
@@ -1289,15 +1289,15 @@ Slot.prototype.shrink = function (val) {
  * *mutation proccess* whose roots are these slots to be changed
  *
  * @example
- * let $$p1 = $$(1).tag('p1');
- * let $$p2 = $$(2).tag('p2');
+ * let $$p1 = Slot(1).tag('p1');
+ * let $$p2 = Slot(2).tag('p2');
  * let $$p3 = $$p2.fork(it => it + 1).tag('p3');
- * let $$p4 = $$(function ([p1, p2, p3], { roots, involved }) {
+ * let $$p4 = Slot(function ([p1, p2, p3], { roots, involved }) {
  *   console.log(roots.map(it => it.tag())); // p1, p2
  *   console.log(involved.map(it => it.tag())); // p1, p2, p3
  *   return p1 + p2 + p3;
  * }, [$$p1, $$p2, $$p3]);
- * $$.mutateWith([
+ * rimple.mutateWith([
  *   [$$p1, n => n + 1],
  *   [$$p2, n => n + 2],
  * ]);
@@ -1322,15 +1322,15 @@ var mutateWith = function mutateWith(slotFnPairs) {
  * roots are these slots to be changed
  *
  * @example
- * let $$p1 = $$(1).tag('p1');
- * let $$p2 = $$(2).tag('p2');
+ * let $$p1 = Slot(1).tag('p1');
+ * let $$p2 = Slot(2).tag('p2');
  * let $$p3 = $$p2.fork(it => it + 1).tag('p3');
- * let $$p4 = $$(function ([p1, p2, p3], { roots, involved }) {
+ * let $$p4 = Slot(function ([p1, p2, p3], { roots, involved }) {
  *   console.log(roots.map(it => it.tag())); // p1, p2
  *   console.log(involved.map(it => it.tag())); // p1, p2, p3
  *   return p1 + p2 + p3;
  * }, [$$p1, $$p2, $$p3]);
- * $$.mutate([
+ * rimple.mutate([
  *   [$$p1, 2],
  *   [$$p2, 4],
  * ]);
@@ -1537,7 +1537,7 @@ var mutate = function mutate(slotValuePairs) {
  * apply the function to me
  *
  * @example
- * const $$s = $$(1);
+ * const $$s = Slot(1);
  * $$s.mutateWith(function (s, n) {
  *  return s + n;
  * }, [2]);
@@ -1545,7 +1545,7 @@ var mutate = function mutate(slotValuePairs) {
  *
  * is equivalent to
  * @example
- * const $$s = $$(1);
+ * const $$s = Slot(1);
  * $$s.val(function (s, n) { return s + n; }($$s.val(), 2));
  *
  * @param {function} func - the mutation function
@@ -1565,12 +1565,12 @@ Slot.prototype.mutateWith = function mutateWith(func) {
  * add methods to Slot's prototype
  *
  * @example
- * $$.mixin({
+ * rimple.mixin({
  *   negate() {
  *     return this.val(-this.val());
  *   }
  * });
- * const $$s = $$(1).negate();
+ * const $$s = Slot(1).negate();
  * console.log($$s.val()); // output -1
  *
  * @param {object} mixins - the mixins to be added
