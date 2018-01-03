@@ -2,7 +2,7 @@
 
 [API](https://xiechao06.github.io/rimple).
 
-A deadly simple reactive frontend library.
+A reactive state synchronizing library.
 
 ## PURPOSE
 
@@ -12,14 +12,23 @@ Synchronize the state among ui/component/state. Acts the similar role as:
   * [rxjs](https://github.com/ReactiveX/rxjs)
   * [mobx](https://github.com/mobxjs/mobx)
 
-With a very simple idea:
+and with a very simple idea:
 
 ```
 UI/Component/State won't be differentiated anymore, they follows/connects/watches
 others, forms a following graph where each node is called SLOT. when one node's 
-followings mutation, it is re-evaluated accordingly, and propogates the mutation 
+followings mutate, it is re-evaluated accordingly, and propogates the mutation 
 further, just like how interconnected digital circuit components work.
 ```
+
+## PRECAUTION
+
+ * a slot could follow any others slots at its will and form a unlimited long
+   mutation path. BUT NOT ANY CYCLE IS ALLOWED IN this following graph.
+
+ * DON'T MUTATE a slot in onchange handler, unless you make sure there's no
+   deadloop
+ 
 
 ## HOW IT LOOK LIKES
 
@@ -62,7 +71,8 @@ here's another [codepen](https://codepen.io/xiechao06/pen/JMJOaZ).
  * EXPLICITY
 
   Once you are familiar with this paradigm, you could understand why and how 
-  page redraw occurs.
+  page redraw occurs. With caution, you could even eleminate all the unnecessary
+  re-evaluation.
 
  * EFFICIENCY
 
@@ -93,7 +103,7 @@ here's another [codepen](https://codepen.io/xiechao06/pen/JMJOaZ).
   [navigo](https://github.com/krasimir/navigo),
   [virtual-dom](https://github.com/Matt-Esch/virtual-dom), 
   [snabbdom](https://github.com/snabbdom/snabbdom),
-  even with REACT, but I recommend using pure virtual dom implentation personally.
+  even with REACT, but I recommend pure virtual dom implentation personally.
 
 
  * ENCOURAGE PURE FUNCTION AS EVALUATION FUNCTION
