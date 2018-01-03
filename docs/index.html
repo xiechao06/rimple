@@ -43,13 +43,85 @@
 
 
     <section>
-        <article><h1>rimple-js</h1><p><a href="https://xiechao06.github.io/rimple-js">rimple-js</a>.</p>
+        <article><h1>rimple</h1><p><a href="https://xiechao06.github.io/rimple">API</a>.</p>
 <p>A deadly simple reactive frontend library.</p>
-<h1>QUICKSTART</h1><pre class="prettyprint source"><code>$ npm install rimple</code></pre><p>then add the following codes to you html files:</p>
-<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;path/to/rimple/dist/rimple.min.js&quot;></code></pre><h1>TEST</h1><p>clone this repository, and run:</p>
-<pre class="prettyprint source"><code>$ npm install
-$ npm test</code></pre><h1>SAMPLES</h1><p>cd into the samples directories, and each sample's read README.md</p>
-<h1><a href="https://github.com/xiechao06/rimple-js/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3">中文文档</a></h1></article>
+<h2>PURPOSE</h2><p>Synchronize the state among ui/component/state. Acts the similar role as:</p>
+<ul>
+<li><a href="https://redux.js.org">redux</a></li>
+<li><a href="https://github.com/ReactiveX/rxjs">rxjs</a></li>
+<li><a href="https://github.com/mobxjs/mobx">mobx</a></li>
+</ul>
+<p>With a very simple idea:</p>
+<pre class="prettyprint source"><code>UI/Component/State won't be differentiated anymore, they follows/connects/watches
+others, forms a following graph where each node is called SLOT. when one node's 
+followings mutation, it is re-evaluated accordingly, and propogates the mutation 
+further, just like how interconnected digital circuit components work.</code></pre><h2>HOW IT LOOK LIKES</h2><pre class="prettyprint source lang-javascript"><code>// display a counter and a countdown counter
+
+const $$counter = Slot(0);
+
+// counterEl follows counterSlot
+const $$counterEl = Slot(function ([counter]) {
+  return h('.counter', '' + counter);
+}, [$$counter]);
+
+// counterEl follows counterSlot
+const $$countdownCount = Slot(0);
+const $$countdownCounterEl = Slot(function ([counter]) {
+  return h('.counter.countdown', '' + counter);
+}, [$$countdownCounter]);
+
+const $$view = $$(function (el1, el2) {
+  return h('.app', [el1, el2]);
+}, [$$counterEl, $$countdownCounterEl]);
+
+mount($$view, '.container');
+
+setInterval(function () {
+  $$counter.inc();
+  $$countdownCounter.dec();
+}, 1000);</code></pre><p>here's another <a href="https://codepen.io/xiechao06/pen/JMJOaZ">codepen</a>.</p>
+<h2>FEATURES</h2><ul>
+<li><p>SIMPLE</p>
+<p><em>rimple</em> just provides one paradigm which is easily understandable.</p>
+</li>
+<li><p>EXPLICITY</p>
+<p>Once you are familiar with this paradigm, you could understand why and how 
+page redraw occurs.</p>
+</li>
+<li><p>EFFICIENCY</p>
+<p><em>ripple</em> will find the most effient propogation path in one mutation process, 
+and guarantees:</p>
+<pre class="prettyprint source"><code>in one mutaion proccess, a slot will be re-evaluated ONCE only after all of
+its followings re-evaluated.</code></pre><p>To understande this, here's an example:</p>
+<p><img src="https://user-images.githubusercontent.com/2888536/34474580-c5a1a54a-efbb-11e7-92bf-b7e60d6d35a1.png" alt=""></p>
+<p>Let's assume A is mutated, and a mutaion process starts, if we adopt a breadth-first
+algorithm, the mutation process will be executed in following steps:</p>
+<ol>
+<li>B (because of A's mutation, but this is INCORRECT, since C has the wrong value)</li>
+<li>C (because of A)</li>
+<li>B (because of B's mutation)</li>
+</ol>
+<p>but in <em>ripple</em>, step 1 will be SKIPPED, actually ripple adopts a level-by-level 
+algorithm to execute the mutation process</p>
+</li>
+<li><p>ORTHOGONAL TO OTHER LIBS</p>
+<p>since <em>rimple</em> focuses on state synchronizing, it works smoothly with
+<a href="https://github.com/krasimir/navigo">navigo</a>,
+<a href="https://github.com/Matt-Esch/virtual-dom">virtual-dom</a>, 
+<a href="https://github.com/snabbdom/snabbdom">snabbdom</a>,
+even with REACT, but I recommend using pure virtual dom implentation personally.</p>
+</li>
+</ul>
+<ul>
+<li>ENCOURAGE PURE FUNCTION AS EVALUATION FUNCTION</li>
+</ul>
+<h2>USAGE</h2><pre class="prettyprint source"><code>$ npm install rimple</code></pre><p>then add the following codes to you html files:</p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;path/to/rimple/dist/rimple.min.js&quot;></code></pre><p>Then you could access <code>rimple</code> by:</p>
+<pre class="prettyprint source lang-javascript"><code>console.log(rimple); // output {Slot: ƒ, mutate: ƒ, mutateWith: ƒ, mixin: ƒ}</code></pre><p>Or in node environment: </p>
+<pre class="prettyprint source lang-javascript"><code>var rimple = require('rimple');</code></pre><h2>TEST</h2><p>clone this repository, and run:</p>
+<pre class="prettyprint source"><code>- $ npm install
+- $ npm test</code></pre><h2>SAMPLES</h2><p>cd into the samples directories, and each sample's read README.md</p>
+<h2><a href="https://github.com/xiechao06/rimple/wiki/%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3">中文文档</a></h2></article>
     </section>
 
 
@@ -66,7 +138,7 @@ $ npm test</code></pre><h1>SAMPLES</h1><p>cd into the samples directories, and e
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 03 2018 15:25:39 GMT+0800 (CST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 03 2018 16:45:33 GMT+0800 (CST)
 </footer>
 
 <script> prettyPrint(); </script>
