@@ -633,6 +633,9 @@ Slot.prototype.shrink = function (val) {
  * mutate a group of slots by applying functions upon them, and starts a
  * *mutation proccess* whose roots are these slots to be changed
  *
+ * NOTE!!! this is not the same as set value for each slot one by one, but
+ * consider them as a whole to find the best mutaion path
+ *
  * @example
  * let $$p1 = Slot(1).tag('p1');
  * let $$p2 = Slot(2).tag('p2');
@@ -659,8 +662,11 @@ const mutateWith = function (slotFnPairs) {
 };
 
 /**
- * mutate a group of slots, and starts a *mutation proccess* whose
- * roots are these slots to be changed
+ * mutate a group of slots, and starts ONE *mutation proccess* whose
+ * roots are these slots to be changed.
+ *
+ * NOTE!!! this is not the same as set value for each slot one by one, but
+ * consider them as a whole to find the best mutaion path
  *
  * @example
  * let $$p1 = Slot(1).tag('p1');
