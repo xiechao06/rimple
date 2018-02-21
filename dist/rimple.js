@@ -56,7 +56,7 @@ var objectOps = {
    * */
   patch: function patch(obj) {
     this.debug && console.info('slot: slot ' + this.tag() + ' is about to be patched', obj);
-    return this.val(Object.assign(this.val(), obj));
+    return this.val(Object.assign({}, this.val(), obj));
   },
 
   /**
@@ -94,7 +94,7 @@ var objectOps = {
       }
     }
 
-    return this.val(this._value);
+    return this.val(Object.assign({}, this._value));
   },
 
   /**
@@ -108,10 +108,10 @@ var objectOps = {
    * */
   setProp: function setProp(prop, value) {
     if (typeof value == 'function') {
-      value = value.apply(this, [this.value[prop]]);
+      value = value.apply(this, [this._value[prop]]);
     }
-    this.value[prop] = value;
-    this.touch();
+    this._value[prop] = value;
+    this.val(Object.assign({}, this._value));
     return this;
   },
 
@@ -125,7 +125,7 @@ var objectOps = {
    * @return {Slot} this
    * */
   setPath: function setPath(path, value) {
-    var o = this.value;
+    var o = this._value;
     var _iteratorNormalCompletion2 = true;
     var _didIteratorError2 = false;
     var _iteratorError2 = undefined;
@@ -157,7 +157,7 @@ var objectOps = {
       value = value.apply(this, [o[lastSeg]]);
     }
     o[lastSeg] = value;
-    this.touch();
+    this.val(Object.assign({}, this._value));
     return this;
   }
 };
@@ -246,7 +246,7 @@ var listOps = {
    * @return {Slot} this
    * */
   concat: function concat(arr) {
-    return this.val(this.val().concat(arr));
+    return this.val([].concat(this.val()).concat(arr));
   },
 
   /**
@@ -303,7 +303,7 @@ var listOps = {
    * */
   shift: function shift() {
     this.val().shift();
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
   },
 
@@ -318,7 +318,7 @@ var listOps = {
    * */
   unshift: function unshift(o) {
     this.val().unshift(o);
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
   },
 
@@ -333,7 +333,7 @@ var listOps = {
    * */
   push: function push(o) {
     this.val().push(o);
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
   },
 
@@ -348,7 +348,7 @@ var listOps = {
    * */
   pop: function pop() {
     this.val().pop();
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
   },
 
@@ -362,7 +362,7 @@ var listOps = {
    * @return {Slot} this
    * */
   reverse: function reverse() {
-    this.val(this.val().reverse());
+    this.val([].concat(this.val().reverse()));
     return this;
   }
 };
@@ -493,7 +493,7 @@ var Slot = function Slot() {
   });
   Object.defineProperty(this, 'followers', {
     get: function get() {
-      return _objectValues(this._followerMaps);
+      return _objectValues(this._followerMap);
     }
   });
   if (args.length <= 1) {
@@ -707,7 +707,7 @@ Slot.prototype.replaceFollowing = function replaceFollowing(idx, following) {
     return this;
   }
   if (replaced instanceof Slot) {
-    delete replaced._followerMap[this.id];
+    delete replaced._followerMap[this._id];
     replaced._offspringLevels = replaced._offspringMap = void 0;
     replaced._getAncestors().forEach(function (ancestor) {
       ancestor._offspringLevels = ancestor._offspringMap = void 0;
@@ -878,10 +878,10 @@ Slot.prototype.val = function val() {
  * @param {any} newV - the new value of slot,
  * */
 Slot.prototype.setV = function setV(newV) {
-  if (typeof this._mutationTester === 'function' && !this._mutationTester(this.value, newV)) {
+  if (typeof this._mutationTester === 'function' && !this._mutationTester(this._value, newV)) {
     return this;
   }
-  this.debug && console.info('slot: slot ' + this._tag + ' mutated -- ', this.value, '->', newV);
+  this.debug && console.info('slot: slot ' + this._tag + ' mutated -- ', this._value, '->', newV);
   var oldV = this._value;
   this._value = newV;
   this._propogate({ roots: [this] });
@@ -1586,12 +1586,20 @@ var mixin = function mixin(mixins) {
   Object.assign(Slot.prototype, mixins);
 };
 
+var immSlot = function immSlot(value) {
+  return Slot(value).mutationTester(function (a, b) {
+    return a !== b;
+  });
+};
+
 mixin(booleanOps);
 mixin(objectOps);
 mixin(numberOps);
 mixin(listOps);
 
 var index = {
+  slot: Slot,
+  immSlot: immSlot,
   Slot: Slot,
   mutate: mutate,
   mutateWith: mutateWith,

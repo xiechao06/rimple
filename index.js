@@ -122,7 +122,7 @@ const Slot = function Slot(...args) {
   });
   Object.defineProperty(this, 'followers', {
     get: function get() {
-      return _objectValues(this._followerMaps);
+      return _objectValues(this._followerMap);
     }
   });
   if (args.length <= 1) {
@@ -306,7 +306,7 @@ Slot.prototype.replaceFollowing = function replaceFollowing(idx, following) {
     return this;
   }
   if (replaced instanceof Slot) {
-    delete replaced._followerMap[this.id];
+    delete replaced._followerMap[this._id];
     replaced._offspringLevels = replaced._offspringMap = void 0;
     replaced._getAncestors().forEach(function (ancestor) {
       ancestor._offspringLevels = ancestor._offspringMap = void 0;
@@ -412,11 +412,11 @@ Slot.prototype.val = function val(...args) {
  * @param {any} newV - the new value of slot,
  * */
 Slot.prototype.setV = function setV(newV) {
-  if (typeof this._mutationTester === 'function' && !this._mutationTester(this.value, newV)) {
+  if (typeof this._mutationTester === 'function' && !this._mutationTester(this._value, newV)) {
     return this;
   }
   this.debug && console.info(
-    `slot: slot ${this._tag} mutated -- `, this.value, '->', newV
+    `slot: slot ${this._tag} mutated -- `, this._value, '->', newV
   );
   let oldV = this._value;
   this._value = newV;
@@ -821,12 +821,23 @@ const mixin = function mixin(mixins) {
   Object.assign(Slot.prototype, mixins);
 };
 
+/**
+ * create an immutable slot, which use '===' to test if value is mutated
+ * */
+const immSlot = function (value) {
+  return Slot(value).mutationTester(function (a, b) {
+    return a !== b;
+  });
+};
+
 mixin(booleanOps);
 mixin(objectOps);
 mixin(numberOps);
 mixin(listOps);
 
 export default {
+  slot: Slot,
+  immSlot,
   Slot,
   mutate,
   mutateWith,

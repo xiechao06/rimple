@@ -20,7 +20,7 @@ export default {
     this.debug && console.info(
       `slot: slot ${this.tag()} is about to be patched`, obj
     );
-    return this.val(Object.assign(this.val(), obj));
+    return this.val(Object.assign({}, this.val(), obj));
   },
   /**
    * omit the keys
@@ -35,7 +35,7 @@ export default {
     for (let field of keys) {
       delete this._value[field];
     }
-    return this.val(this._value);
+    return this.val(Object.assign({}, this._value));
   },
   /**
    * set the property of Slot's value
@@ -48,10 +48,10 @@ export default {
    * */
   setProp(prop, value) {
     if (typeof value == 'function') {
-      value = value.apply(this, [this.value[prop]]);
+      value = value.apply(this, [this._value[prop]]);
     }
-    this.value[prop] = value;
-    this.touch();
+    this._value[prop] = value;
+    this.val(Object.assign({}, this._value));
     return this;
   },
   /**
@@ -64,7 +64,7 @@ export default {
    * @return {Slot} this
    * */
   setPath(path, value) {
-    let o = this.value;
+    let o = this._value;
     for (let seg of path.slice(0, -1)) {
       o[seg] = o[seg] || {};
       o = o[seg];
@@ -74,7 +74,7 @@ export default {
       value = value.apply(this, [o[lastSeg]]);
     }
     o[lastSeg] = value;
-    this.touch();
+    this.val(Object.assign({}, this._value));
     return this;
   }
 };
