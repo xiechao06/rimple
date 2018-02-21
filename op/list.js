@@ -12,7 +12,7 @@ export default {
    * @return {Slot} this
    * */
   concat(arr) {
-    return this.val(this.val().concat(arr));
+    return this.val([].concat(this.val()).concat(arr));
   },
   /**
    * map the Slot's value with a function
@@ -65,7 +65,7 @@ export default {
    * */
   shift() {
     this.val().shift();
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
   },
   /**
@@ -79,7 +79,7 @@ export default {
    * */
   unshift(o) {
     this.val().unshift(o);
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
   },
   /**
@@ -93,7 +93,7 @@ export default {
    * */
   push(o) {
     this.val().push(o);
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
 
   },
@@ -108,7 +108,7 @@ export default {
    * */
   pop() {
     this.val().pop();
-    this.touch();
+    this.val([].concat(this.val()));
     return this;
   },
   /**
@@ -121,7 +121,7 @@ export default {
    * @return {Slot} this
    * */
   reverse() {
-    this.val(this.val().reverse());
+    this.val([].concat(this.val().reverse()));
     return this;
   }
 };
