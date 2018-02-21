@@ -1586,6 +1586,9 @@ var mixin = function mixin(mixins) {
   Object.assign(Slot.prototype, mixins);
 };
 
+/**
+ * create an immutable slot, which use '===' to test if value is mutated
+ * */
 var immSlot = function immSlot(value) {
   return Slot(value).mutationTester(function (a, b) {
     return a !== b;
