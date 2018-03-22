@@ -2,6 +2,7 @@
   "name": "rimple",
   "version": "0.2.1",
   "description": "",
+  "module": "index.js",
   "main": "dist/ripple.js",
   "dependencies": {},
   "devDependencies": {

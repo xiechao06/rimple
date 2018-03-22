@@ -1,8 +1,8 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define('rimple', factory) :
-	(global.rimple = factory());
-}(this, (function () { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define('rimple', ['exports'], factory) :
+	(factory((global.rimple = {})));
+}(this, (function (exports) { 'use strict';
 
 /**
  * these are a group of operations to mutate a slot with value type of boolean
@@ -42,7 +42,7 @@ var booleanOps = {
  * @lends Slot.prototype
  *
  * */
-var objectOps = {
+var patch = {
   /**
    * patch the object value
    * @example
@@ -101,17 +101,17 @@ var objectOps = {
    * set the property of Slot's value
    * @example
    * const $$s = $$({ name: 'Tom', color: 'Red' });
-   * $$s.setProp('color', 'Blue');
+   * $$s.set('color', 'Blue');
    * console.log($$s.val(); // { name: 'Tom', color: 'Red' }
    *
    * @return {Slot} this
    * */
-  setProp: function setProp(prop, value) {
+  set: function set(prop, value) {
     if (typeof value == 'function') {
       value = value.apply(this, [this._value[prop]]);
     }
     this._value[prop] = value;
-    this.val(Object.assign({}, this._value));
+    this.val(Array.isArray(this._value) ? [].concat(this._value) : Object.assign({}, this._value));
     return this;
   },
 
@@ -119,39 +119,23 @@ var objectOps = {
    * set the deep property of Slot's value
    * @example
    * const $$s = $$({ name: 'Tom' });
-   * $$s.setPath(['friend', 'name'], 'Jerry');
+   * $$s.setIn(['friend', 'name'], 'Jerry');
    * console.log($$s.val(); // { name: 'Tom', frien: { 'name': 'Red'} }
+   *
+   * @example
+   * const s = slot({});
+   * s.setIn(['a', 1], 'abc'); // { a: [, 'abc'] }
    *
    * @return {Slot} this
    * */
-  setPath: function setPath(path, value) {
+  setIn: function setIn(path, value) {
     var o = this._value;
-    var _iteratorNormalCompletion2 = true;
-    var _didIteratorError2 = false;
-    var _iteratorError2 = undefined;
-
-    try {
-      for (var _iterator2 = path.slice(0, -1)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-        var seg = _step2.value;
-
-        o[seg] = o[seg] || {};
-        o = o[seg];
-      }
-    } catch (err) {
-      _didIteratorError2 = true;
-      _iteratorError2 = err;
-    } finally {
-      try {
-        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-          _iterator2.return();
-        }
-      } finally {
-        if (_didIteratorError2) {
-          throw _iteratorError2;
-        }
-      }
+    for (var i = 0; i < path.length - 1; ++i) {
+      var seg = path[i];
+      var nextSeg = path[i + 1];
+      o[seg] = o[seg] || (Number.isInteger(nextSeg) ? [] : {});
+      o = o[seg];
     }
-
     var lastSeg = path[path.length - 1];
     if (typeof value == 'function') {
       value = value.apply(this, [o[lastSeg]]);
@@ -161,6 +145,9 @@ var objectOps = {
     return this;
   }
 };
+
+patch.assoc = patch.set;
+patch.assocIn = patch.setIn;
 
 /**
  * these are a group of operations to mutate a slot with value type of number
@@ -999,7 +986,7 @@ Slot.prototype._setupOffsprings = function () {
       return a.level - b.level;
     })[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
       var _ref4 = _step8.value;
-      var slot = _ref4.slot;
+      var _slot = _ref4.slot;
       var _level = _ref4.level;
 
       if (_level > currentLevel) {
@@ -1007,7 +994,7 @@ Slot.prototype._setupOffsprings = function () {
         this._offspringLevels.push(slots);
         currentLevel = _level;
       }
-      slots.push(slot);
+      slots.push(_slot);
     }
   } catch (err) {
     _didIteratorError8 = true;
@@ -1596,20 +1583,20 @@ var immSlot = function immSlot(value) {
 };
 
 mixin(booleanOps);
-mixin(objectOps);
+mixin(patch);
 mixin(numberOps);
 mixin(listOps);
 
-var index = {
-  slot: Slot,
-  immSlot: immSlot,
-  Slot: Slot,
-  mutate: mutate,
-  mutateWith: mutateWith,
-  mixin: mixin
-};
+var slot = Slot;
 
-return index;
+exports.Slot = Slot;
+exports.mutateWith = mutateWith;
+exports.mutate = mutate;
+exports.mixin = mixin;
+exports.immSlot = immSlot;
+exports.slot = slot;
+
+Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 

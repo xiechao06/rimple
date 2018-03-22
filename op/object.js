@@ -4,7 +4,7 @@
  * @lends Slot.prototype
  *
  * */
-export default {
+const patch = {
   /**
    * patch the object value
    * @example
@@ -41,32 +41,42 @@ export default {
    * set the property of Slot's value
    * @example
    * const $$s = $$({ name: 'Tom', color: 'Red' });
-   * $$s.setProp('color', 'Blue');
+   * $$s.set('color', 'Blue');
    * console.log($$s.val(); // { name: 'Tom', color: 'Red' }
    *
    * @return {Slot} this
    * */
-  setProp(prop, value) {
+  set(prop, value) {
     if (typeof value == 'function') {
       value = value.apply(this, [this._value[prop]]);
     }
     this._value[prop] = value;
-    this.val(Object.assign({}, this._value));
+    this.val(
+      Array.isArray(this._value)?
+        [].concat(this._value):
+        Object.assign({}, this._value)
+    );
     return this;
   },
   /**
    * set the deep property of Slot's value
    * @example
    * const $$s = $$({ name: 'Tom' });
-   * $$s.setPath(['friend', 'name'], 'Jerry');
+   * $$s.setIn(['friend', 'name'], 'Jerry');
    * console.log($$s.val(); // { name: 'Tom', frien: { 'name': 'Red'} }
+   *
+   * @example
+   * const s = slot({});
+   * s.setIn(['a', 1], 'abc'); // { a: [, 'abc'] }
    *
    * @return {Slot} this
    * */
-  setPath(path, value) {
+  setIn(path, value) {
     let o = this._value;
-    for (let seg of path.slice(0, -1)) {
-      o[seg] = o[seg] || {};
+    for (let i = 0; i < path.length - 1; ++i) {
+      let seg = path[i];
+      let nextSeg = path[i + 1];
+      o[seg] = o[seg] || (Number.isInteger(nextSeg)? []: {});
       o = o[seg];
     }
     let lastSeg = path[path.length - 1];
@@ -78,3 +88,8 @@ export default {
     return this;
   }
 };
+
+patch.assoc = patch.set;
+patch.assocIn = patch.setIn;
+
+export default patch;

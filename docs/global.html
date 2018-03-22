@@ -94,32 +94,18 @@
     
 
     
-
-    
-        <h3 class="subsection-title">Methods</h3>
+        <h3 class="subsection-title">Members</h3>
 
         
             
+<h4 class="name" id="immSlot"><span class="type-signature">(constant) </span>immSlot<span class="type-signature"></span></h4>
 
-    
-
-    
-    <h4 class="name" id="immSlot"><span class="type-signature"></span>immSlot<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
 
 <div class="description">
     <p>create an immutable slot, which use '===' to test if value is mutated</p>
 </div>
-
-
-
-
-
-
 
 
 
@@ -172,28 +158,10 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
         
             
+<h4 class="name" id="mixin"><span class="type-signature">(constant) </span>mixin<span class="type-signature"></span></h4>
 
-    
-
-    
-    <h4 class="name" id="mixin"><span class="type-signature"></span>mixin<span class="signature">(mixins)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
 
@@ -201,61 +169,6 @@
     <p>add methods to Slot's prototype</p>
 </div>
 
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>mixins</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>the mixins to be added</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -306,18 +219,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>rimple.mixin({
@@ -332,14 +233,8 @@ console.log($$s.val()); // output -1</code></pre>
 
         
             
+<h4 class="name" id="mutate"><span class="type-signature">(constant) </span>mutate<span class="type-signature"></span></h4>
 
-    
-
-    
-    <h4 class="name" id="mutate"><span class="type-signature"></span>mutate<span class="signature">(slotValuePairs)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
 
@@ -350,62 +245,6 @@ roots are these slots to be changed.</p>
 consider them as a whole to find the best mutaion path</p>
 </div>
 
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>slotValuePairs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>each element is an array, whose first value is
-a Slot, and second is the new value of slots</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -456,18 +295,6 @@ a Slot, and second is the new value of slots</p></td>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>let $$p1 = Slot(1).tag('p1');
@@ -488,14 +315,8 @@ console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11</cod
 
         
             
+<h4 class="name" id="mutateWith"><span class="type-signature">(constant) </span>mutateWith<span class="type-signature"></span></h4>
 
-    
-
-    
-    <h4 class="name" id="mutateWith"><span class="type-signature"></span>mutateWith<span class="signature">(slotValuePairs)</span><span class="type-signature"></span></h4>
-    
-
-    
 
 
 
@@ -506,62 +327,6 @@ console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11</cod
 consider them as a whole to find the best mutaion path</p>
 </div>
 
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>slotValuePairs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>each element is an array, whose first value is
-a Slot, and second is the function to be applied</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -612,18 +377,6 @@ a Slot, and second is the function to be applied</p></td>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>let $$p1 = Slot(1).tag('p1');
@@ -648,6 +401,8 @@ console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11</cod
     
 
     
+
+    
 </article>
 
 </section>
@@ -664,7 +419,7 @@ console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11</cod
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Feb 21 2018 17:46:46 GMT+0800 (CST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 22 2018 11:31:39 GMT+0800 (CST)
 </footer>
 
 <script> prettyPrint(); </script>

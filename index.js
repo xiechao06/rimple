@@ -98,7 +98,7 @@ const _objectValues = function _objectValues(obj) {
  *  ```
  *
  * */
-const Slot = function Slot(...args) {
+export const Slot = function Slot(...args) {
   if (!(this instanceof Slot)) {
     return new Slot(...args);
   }
@@ -655,7 +655,7 @@ Slot.prototype.shrink = function (val) {
  * a Slot, and second is the function to be applied
  *
  * */
-const mutateWith = function (slotFnPairs) {
+export const mutateWith = function mutateWith(slotFnPairs) {
   return mutate(slotFnPairs.map(function ([slot, fn]) {
     return [slot, fn && fn.apply(slot, [slot.val()])];
   }));
@@ -687,7 +687,7 @@ const mutateWith = function (slotFnPairs) {
  * a Slot, and second is the new value of slots
  *
  * */
-const mutate = function (slotValuePairs) {
+export const mutate = function (slotValuePairs) {
   let cleanSlots = {};
   let roots = slotValuePairs.map(([slot]) => slot);
   // mutate the targets directly
@@ -817,14 +817,14 @@ Slot.prototype.mutateWith = function mutateWith(func, args=[]) {
  * @param {object} mixins - the mixins to be added
  *
  * */
-const mixin = function mixin(mixins) {
+export const mixin = function mixin(mixins) {
   Object.assign(Slot.prototype, mixins);
 };
 
 /**
  * create an immutable slot, which use '===' to test if value is mutated
  * */
-const immSlot = function (value) {
+export const immSlot = function (value) {
   return Slot(value).mutationTester(function (a, b) {
     return a !== b;
   });
@@ -835,11 +835,4 @@ mixin(objectOps);
 mixin(numberOps);
 mixin(listOps);
 
-export default {
-  slot: Slot,
-  immSlot,
-  Slot,
-  mutate,
-  mutateWith,
-  mixin,
-};
+export const slot = Slot;
