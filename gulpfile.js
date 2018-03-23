@@ -40,11 +40,19 @@ const build = function build () {
       }),
       ...(environments.production()? [minify()]: [])
     ]
-  }, {
-    file: environments.production()? 'rimple.min.js': 'rimple.js',
-    format: 'umd',
+  }, [{
+    file: 'rimple.cjs.js',
+    format: 'cjs',
     name: 'rimple'
-  }))
+  }, {
+    file: 'rimple.es6.js',
+    format: 'es',
+    name: 'rimple'
+  }, {
+    file: environments.production()? 'rimple.browser.min.js': 'rimple.browser.js',
+    format: 'iife',
+    name: 'rimple'
+  }]))
   .pipe(sourcemaps.write('./'))
   .pipe(gulp.dest('./dist'));
 };

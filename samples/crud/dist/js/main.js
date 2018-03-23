@@ -1128,13 +1128,6 @@ var _1_1_0_strictUriEncode = function (str) {
 	});
 };
 
-
-
-var _1_1_0_strictUriEncode$2 = Object.freeze({
-	default: _1_1_0_strictUriEncode,
-	__moduleExports: _1_1_0_strictUriEncode
-});
-
 /*
 object-assign
 (c) Sindre Sorhus
@@ -1225,13 +1218,6 @@ var _4_1_1_objectAssign = shouldUseNative() ? Object.assign : function (target, 
 
 	return to;
 };
-
-
-
-var _4_1_1_objectAssign$2 = Object.freeze({
-	default: _4_1_1_objectAssign,
-	__moduleExports: _4_1_1_objectAssign
-});
 
 'use strict';
 var token = '%[a-f0-9]{2}';
@@ -1328,19 +1314,6 @@ var _0_2_0_decodeUriComponent = function (encodedURI) {
 	}
 };
 
-
-
-var _0_2_0_decodeUriComponent$2 = Object.freeze({
-	default: _0_2_0_decodeUriComponent,
-	__moduleExports: _0_2_0_decodeUriComponent
-});
-
-var strictUriEncode = ( _1_1_0_strictUriEncode$2 && _1_1_0_strictUriEncode ) || _1_1_0_strictUriEncode$2;
-
-var objectAssign = ( _4_1_1_objectAssign$2 && _4_1_1_objectAssign ) || _4_1_1_objectAssign$2;
-
-var decodeComponent = ( _0_2_0_decodeUriComponent$2 && _0_2_0_decodeUriComponent ) || _0_2_0_decodeUriComponent$2;
-
 'use strict';
 
 
@@ -1436,7 +1409,7 @@ function parserForArrayFormat(opts) {
 
 function encode(value, opts) {
 	if (opts.encode) {
-		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
+		return opts.strict ? _1_1_0_strictUriEncode(value) : encodeURIComponent(value);
 	}
 
 	return value;
@@ -1465,7 +1438,7 @@ var extract = function (str) {
 };
 
 var parse = function (str, opts) {
-	opts = objectAssign({arrayFormat: 'none'}, opts);
+	opts = _4_1_1_objectAssign({arrayFormat: 'none'}, opts);
 
 	var formatter = parserForArrayFormat(opts);
 
@@ -1492,9 +1465,9 @@ var parse = function (str, opts) {
 
 		// missing `=` should be `null`:
 		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
-		val = val === undefined ? null : decodeComponent(val);
+		val = val === undefined ? null : _0_2_0_decodeUriComponent(val);
 
-		formatter(decodeComponent(key), val, ret);
+		formatter(_0_2_0_decodeUriComponent(key), val, ret);
 	});
 
 	return Object.keys(ret).sort().reduce(function (result, key) {
@@ -1517,7 +1490,7 @@ var stringify = function (obj, opts) {
 		arrayFormat: 'none'
 	};
 
-	opts = objectAssign(defaults, opts);
+	opts = _4_1_1_objectAssign(defaults, opts);
 
 	var formatter = encoderForArrayFormat(opts);
 

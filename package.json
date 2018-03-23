@@ -2,8 +2,8 @@
   "name": "rimple",
   "version": "0.3.0",
   "description": "",
-  "module": "index.js",
-  "main": "dist/ripple.js",
+  "module": "dist/rimple.es6.js",
+  "main": "dist/rimple.cjs.js",
   "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.0",

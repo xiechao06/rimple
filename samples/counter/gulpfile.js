@@ -29,13 +29,13 @@ gulp.task('watch', function() {
 });
 
 gulp.task('link', function (cb) {
-  fs.access('../../../dist/rimple.js', fs.constants.R_OK, (err) => {
+  fs.access('../../dist/rimple.browser.js', fs.constants.R_OK, (err) => {
     if (err) {
       console.log('please run npm build in package root directory!');
       return;
     }
-    exec('ln -sf ../../../dist/rimple.js ./js/rimple.js', () => {
-      exec('ln -sf ../../../dist/rimple.js.map ./js/rimple.js.map', () => {
+    exec('ln -sf ../../../dist/rimple.browser.js ./js/rimple.browser.js', () => {
+      exec('ln -sf ../../../dist/rimple.browser.js.map ./js/rimple.browser.js.map', () => {
         cb();
       });
     });
