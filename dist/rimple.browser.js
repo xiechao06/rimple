@@ -1,23 +1,70 @@
 var rimple = (function (exports) {
 'use strict';
 
+/**
+ * these are a group of operations to mutate a slot with value type of boolean
+ *
+ * @lends Slot.prototype
+ *
+ * */
 var booleanOps = {
+  /**
+   * toggle the Slot's value
+   * @return {Slot} this
+   * */
   toggle: function toggle() {
     return this.val(!this.val());
   },
+
+  /**
+   * make the Slot's value to be true
+   * @return {Slot} this
+   * */
   on: function on() {
     return this.val(true);
   },
+
+  /**
+   * make the Slot's value to be false
+   * @return {Slot} this
+   * */
   off: function off() {
     return this.val(false);
   }
 };
 
+/**
+ * these are a group of operations to mutate a slot with value type of Object
+ *
+ * @lends Slot.prototype
+ *
+ * */
 var patch = {
+  /**
+   * patch the object value
+   * @example
+   * const $$s = $$({ name: 'Tom', color: 'Blue' });
+   * $$s.patch({ name: 'Jerry', species: 'Mouse' });
+   * console.log($$s.val()); // { name: 'Jerry', species: 'Mouse', colur: 'Blue' }
+   *
+   * @param {object} obj - object used to patch me
+   * @return {Slot} this
+   *
+   * */
   patch: function patch(obj) {
     this.debug && console.info('slot: slot ' + this.tag() + ' is about to be patched', obj);
     return this.val(Object.assign({}, this.val(), obj));
   },
+
+  /**
+   * omit the keys
+   * @example
+   * const $$s = $$({ name: 'Tom', color: 'Blue' });
+   * $$s.omit(['color']);
+   * console.log($$s.val(); // { name: 'Tom' }
+   *
+   * @return {Slot} this
+   * */
   omit: function omit(keys) {
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
@@ -46,6 +93,16 @@ var patch = {
 
     return this.val(Object.assign({}, this._value));
   },
+
+  /**
+   * set the property of Slot's value
+   * @example
+   * const $$s = $$({ name: 'Tom', color: 'Red' });
+   * $$s.set('color', 'Blue');
+   * console.log($$s.val(); // { name: 'Tom', color: 'Red' }
+   *
+   * @return {Slot} this
+   * */
   set: function set(prop, value) {
     if (typeof value == 'function') {
       value = value.apply(this, [this._value[prop]]);
@@ -54,6 +111,20 @@ var patch = {
     this.val(Array.isArray(this._value) ? [].concat(this._value) : Object.assign({}, this._value));
     return this;
   },
+
+  /**
+   * set the deep property of Slot's value
+   * @example
+   * const $$s = $$({ name: 'Tom' });
+   * $$s.setIn(['friend', 'name'], 'Jerry');
+   * console.log($$s.val(); // { name: 'Tom', frien: { 'name': 'Red'} }
+   *
+   * @example
+   * const s = slot({});
+   * s.setIn(['a', 1], 'abc'); // { a: [, 'abc'] }
+   *
+   * @return {Slot} this
+   * */
   setIn: function setIn(path, value) {
     var o = this._value;
     for (var i = 0; i < path.length - 1; ++i) {
@@ -75,63 +146,205 @@ var patch = {
 patch.assoc = patch.set;
 patch.assocIn = patch.setIn;
 
+/**
+ * these are a group of operations to mutate a slot with value type of number
+ *
+ * @lends Slot.prototype
+ *
+ * */
 var numberOps = {
+
+  /**
+   * increment the slot's value, the slot's value should be of type number
+   *
+   * @param {number} cnt - the value to be added, default is 1
+   * @return {Slot} this
+   * */
   inc: function inc() {
     var cnt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
     return this.val(this.val() + cnt);
   },
+
+
+  /**
+   * decrement the slot's value, the slot's value should be of type number
+   *
+   * @param {number} cnt - the value to be deremented, default is 1
+   * @return {Slot} this
+   * */
   dec: function dec() {
     var cnt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
 
     return this.val(this.val() - cnt);
   },
+
+
+  /**
+   * get remainder the slot's value, the slot's value should be of type number
+   *
+   * @example
+   * const $$s = $$(17).mod(7);
+   * console.log($$s.val());  // output 3
+   *
+   * @param {number} n - the divisor
+   * @return {Slot} this
+   * */
   mod: function mod(n) {
     return this.val(this.val() % n);
   },
+
+  /**
+   * multiply the slot's value by n, the slot's value should be of type number
+   *
+   * @param {number} n - the multiplier
+   * @return {Slot} this
+   * */
   multiply: function multiply(n) {
     return this.val(this.val() * n);
   },
+
+
+  /**
+   * divides the slot's value by n, the slot's value should be of type number
+   *
+   * @param {number} n - the divisor
+   * @return {Slot} this
+   * */
   divide: function divide(n) {
     return this.val(this.val() / n);
   }
 };
 
+/**
+ * these are a group of operations to mutate a slot with value type of array
+ *
+ * @lends Slot.prototype
+ *
+ * */
 var listOps = {
+  /**
+   * concat the Slot's value with an array
+   *
+   * @param {array} arr
+   * @return {Slot} this
+   * */
   concat: function concat(arr) {
     return this.val([].concat(this.val()).concat(arr));
   },
+
+  /**
+   * map the Slot's value with a function
+   *
+   * @example
+   * const $$s = $$([1, 2, 3]);
+   * console.log($$s.map(it => it * 2).val()); // 2, 4, 6
+   *
+   * @param {function} fn
+   * @return {Slot} this
+   * */
   map: function map(fn) {
     return this.val(this.val().map(fn));
   },
+
+  /**
+   * filter the Slot's value with a function
+   *
+   * @example
+   * const $$s = $$([1, 2, 3, 4]);
+   * console.log($$s.filter(it => it % 2 == 0).val()); // 2, 4
+   *
+   * @param {function} fn
+   * @return {Slot} this
+   * */
   filter: function filter(fn) {
     var val = this.val();
     return this.val(val.filter(fn));
   },
+
+  /**
+   * slice the Slot's value
+   *
+   * @example
+   * const $$s = $$([1, 2, 3, 4]);
+   * console.log($$s.slice(1, 2).val()); // [2]
+   *
+   * @return {Slot} this
+   * */
   slice: function slice() {
     var val = this.val();
     return this.val(val.slice.apply(val, Array.from(arguments)));
   },
+
+  /**
+   * shift the Slot's value
+   *
+   * @example
+   * const $$s = $$([1, 2, 3, 4]);
+   * console.log($$s.shift().val()); // 2, 3, 4
+   *
+   * @return {Slot} this
+   * */
   shift: function shift() {
     this.val().shift();
     this.val([].concat(this.val()));
     return this;
   },
+
+  /**
+   * shift the Slot's value
+   *
+   * @example
+   * const $$s = $$([2, 3, 4]);
+   * console.log($$s.unshift(1).val()); // 1, 2, 3, 4
+   *
+   * @return {Slot} this
+   * */
   unshift: function unshift(o) {
     this.val().unshift(o);
     this.val([].concat(this.val()));
     return this;
   },
+
+  /**
+   * push the Slot's value
+   *
+   * @example
+   * const $$s = $$([1, 2, 3]);
+   * console.log($$s.push(4).val()); // 1, 2, 3, 4
+   *
+   * @return {Slot} this
+   * */
   push: function push(o) {
     this.val().push(o);
     this.val([].concat(this.val()));
     return this;
   },
+
+  /**
+   * push the Slot's value
+   *
+   * @example
+   * const $$s = $$([1, 2, 3]);
+   * console.log($$s.pop().val()); // 1, 2
+   *
+   * @return {Slot} this
+   * */
   pop: function pop() {
     this.val().pop();
     this.val([].concat(this.val()));
     return this;
   },
+
+  /**
+   * reverse the Slot's value
+   *
+   * @example
+   * const $$s = $$([1, 2, 3]);
+   * console.log($$s.pop().val()); // [3, 2, 1]
+   *
+   * @return {Slot} this
+   * */
   reverse: function reverse() {
     this.val([].concat(this.val().reverse()));
     return this;
@@ -169,6 +382,73 @@ var _objectValues = function _objectValues(obj) {
   return values;
 };
 
+/**
+ * @constructor
+ *
+ * @desc A Slot could be created in 2 methods:
+ *
+ *  * new Slot(value)
+ *
+ *  this will make a data slot
+ *
+ *  * new Slot(valueFunc, followings)
+ *
+ *  this will make a follower slot, where followings is an Array.
+ *  if the element (say *following*) in observables is a:
+ *
+ *    * Slot
+ *
+ *      if *following* changed, *follower* will be re-evaludated by executing *valueFunc*,
+ *      following.val() will be used as valueFunc's argument.
+ *      its new value is the return value of *valueFunc*, and change will be propogated to
+ *      *follower*'s followers.
+ *
+ *    * not Slot
+ *
+ *      when *follower* is re-evaluated, following will be used as *valueFunc*'s argument directly.
+ *
+ *  and valueFunc will accept 2 parameters:
+ *
+ *    * the current value of observables
+ *    * mutation process context, it has two keys:
+ *
+ *      * roots - the mutation process roots, namely, those changed by clients (api caller)
+ *        directly
+ *
+ *      * involved - the observed involed in this mutation process
+ *
+ *      the context is very useful if the evaluation function needs to return value
+ *      according to which of its followings mutated
+ *
+ *  let's see two example:
+ *
+ *  ```javascript
+ *
+ *  const $$following = Slot(1);
+ *  const $$follower = Slot((following, n) => following + n, [$$following, 2]);
+ *  console.log($$follower.val()); // output 3, since n is always 2
+ *
+ *  $$following.inc();
+ *  console.log($$follower.val()); // output 4, since n is always 2
+ *  ```
+ *
+ *  ```javascript
+ *
+ *  const $$a = Slot(1).tag('a');
+ *  const $$b = Slot(([a]) => a + 1, [$$a]).tag('b');
+ *  const $$c = Slot(2).tag('c');
+ *  const $$d = Slot(function ([a, b], {roots, involved}) {
+ *    console.log(roots.map(it => it.tag())); // output [a]
+ *    console.log(involved.map(it => it.tag())); // output [b]
+ *    return a + b;
+ *  });
+ *
+ *  // a is root of mutation proccess, and c is not changed in this mutation proccess
+ *  $$a.inc();
+ *
+ *  ```
+ *
+ * */
 var Slot = function Slot() {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
@@ -181,7 +461,7 @@ var Slot = function Slot() {
   this._changeCbs = [];
   this._followings = [];
   this._followerMap = {};
-
+  // offsprings are all direct or indirect followers
   this._offspringMap = {};
   this._offspringLevels = [];
   this._tag = '';
@@ -211,10 +491,26 @@ var Slot = function Slot() {
   }
 };
 
+/**
+ * test if slot observes others
+ * @return {boolean} true if it observes others, else false
+ * */
 Slot.prototype.isTopmost = function isTopmost() {
   return !this._followings.length;
 };
 
+/**
+ * Set/get tag of slot, useful when debugging.
+ *
+ * @example
+ * // set tag will return this
+ * const $$s = Slot('foo').tag('bar');
+ * console.log($$s.tag()); // output bar
+ *
+ * @param {(string|undefined)} v - if is string, set the tag of slot and return this,
+ * else return the tag
+ * @return {(string|Slot)}
+ * */
 Slot.prototype.tag = function tag(v) {
   if (v == void 0) {
     return this._tag;
@@ -223,22 +519,101 @@ Slot.prototype.tag = function tag(v) {
   return this;
 };
 
+/**
+ * set a handler to Slot to test if slot is mutated, here is an example:
+ *
+ * @example
+ * let $$s1 = Slot(true);
+ * let $$s2 = Slot(false);
+ *
+ * let $$s3 = Slot((s1, s2) => s1 && s2, [$$s1, $$s2])
+ * .mutationTester((oldV, newV) => oldV != newV);
+ *
+ * $$s4 = $$s3.makeFollower((s3) => !s3)
+ * .change(function () {
+ *    console.log('s4 changed!');
+ * });
+ *
+ * // $$s2 will be changed to true, but $$s3 is not changed,
+ * // neither $$s4 will be changed
+ * $$s2.toggle();
+ *
+ *
+ * @param {function} tester - a handler to test if slot is changed in one mutation
+ * process, if a slot finds all its dependents are unmutation, the mutation process
+ * stops from it.
+ * A propriate tester will improve the performance dramatically sometimes.
+ *
+ * it access slot as *this* and slot's new value and old value as arguments,
+ * and return true if slot is changed in mutation process, else false.
+ *
+ * */
 Slot.prototype.mutationTester = function mutationTester(tester) {
   this._mutationTester = tester;
   return this;
 };
 
+/**
+ * add a change handler
+ *
+ * !!!Warning, this is a very dangerous operation if you modify slots in
+ * change handler, consider the following scenario:
+ *
+ * ```javascript
+ *  let $$s1 = Slot(1);
+ *  let $$s2 = $$s1.makeFollower(it => it * 2);
+ *  let $$s3 = $$s1.makeFollower(it => it * 3);
+ *  $$s2.change(function () {
+ *    $$s1.val(3); // forever loop
+ *  ));
+ *
+ *  $$s1.val(2);
+ * ```
+ *
+ *
+ *  as a thumb of rule, don't set value for followings in change handler
+ *
+ * @param {function} proc - it will be invoked when slot is mutated in one
+ * mutation process the same order as it is added, it accepts the following
+ * parameters:
+ *
+ *   * new value of Slot
+ *   * the old value of Slot
+ *   * the mutation context
+ *
+ * for example, you could refresh the UI, when ever the final view changed
+ *
+ * @return {Slot} this
+ *
+ * */
 Slot.prototype.change = function (proc) {
   this._changeCbs.push(proc);
   return this;
 };
 
+/**
+ * remove the change handler
+ *
+ * @see {@link Slot#change}
+ * */
 Slot.prototype.offChange = function (proc) {
   this._changeCbs = this._changeCbs.filter(function (cb) {
     return cb != proc;
   });
 };
 
+/**
+ * detach the target slot from its followings, and let its followers
+ * connect me(this), just as if slot has been eliminated after the detachment.
+ * this method is very useful if you want to change the dependent graph
+ *
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param {Slot} targetSlot
+ * @return {Slot} this
+ *
+ * */
 Slot.prototype.override = function override(targetSlot) {
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
@@ -276,13 +651,30 @@ Slot.prototype.override = function override(targetSlot) {
     }
   }
   this._offspringMap = this._offspringLevels = void 0;
-
+  // make ancestors _offspringMap obsolete, why not just calculate _offspringMap
+  // for each ancestor? since this operation should be as quick as possible
+  // and multiple override/replaceFollowing/connect operations could be batched,
+  // since the calculation of springs of ancestors postponed to the moment
+  // when ancestor is evaluated
   targetSlot._getAncestors().forEach(function (ancestor) {
     ancestor._offspringLevels = ancestor._offspringMap = void 0;
   });
   return this;
 };
 
+/**
+ * replaceFollowing, why not just re-follow, since follow is a quite
+ * expensive operation, while replaceFollowing only affect the replaced one
+ *
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param idx the index of following
+ * @param following a slot or any object, if not provided, the "idx"th following will
+ * not be followed anymore.
+ *
+ * @return {Slot} this
+ */
 Slot.prototype.replaceFollowing = function replaceFollowing(idx, following) {
   var args = [idx, 1];
   if (following != void 0) {
@@ -292,6 +684,8 @@ Slot.prototype.replaceFollowing = function replaceFollowing(idx, following) {
   var _followings$splice$ap = this.followings.splice.apply(this.followings, args),
       _followings$splice$ap2 = _slicedToArray(_followings$splice$ap, 1),
       replaced = _followings$splice$ap2[0];
+  // replace the same following, just return
+
 
   if (replaced == following) {
     return this;
@@ -305,7 +699,7 @@ Slot.prototype.replaceFollowing = function replaceFollowing(idx, following) {
   }
   if (following instanceof Slot) {
     following._offspringLevels = following._offspringMap = void 0;
-
+    // make ancestors _offspringMap obsolete
     following._getAncestors().forEach(function (ancestor) {
       ancestor._offspringLevels = ancestor._offspringMap = void 0;
     });
@@ -313,13 +707,23 @@ Slot.prototype.replaceFollowing = function replaceFollowing(idx, following) {
   return this;
 };
 
+/**
+ * this is the shortcut of replaceFollowing(idx)
+ *
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param {number} idx - the index of
+ * */
 Slot.prototype.removeFollowing = function removeFollowing(idx) {
   return this.replaceFollowing(idx);
 };
 
+// propogate from me
 Slot.prototype._propogate = function (_ref) {
   var roots = _ref.roots;
 
+  // if has only one follower, touch it
   var followers = _objectValues(this._followerMap);
   if (followers.length == 0) {
     return;
@@ -332,7 +736,8 @@ Slot.prototype._propogate = function (_ref) {
     this._setupOffsprings();
   }
   var cleanSlots = {};
-
+  // mutate root is always considered to be dirty,
+  // otherwise it won't propogate
   var mutateRoot = this;
   var changeCbArgs = [];
   var _iteratorNormalCompletion2 = true;
@@ -353,7 +758,7 @@ Slot.prototype._propogate = function (_ref) {
           var involved = follower._followings.filter(function (following) {
             return following instanceof Slot && (following._id === mutateRoot._id || mutateRoot._offspringMap[following._id] && !cleanSlots[following._id]);
           });
-
+          // clean follower will be untouched
           var dirty = involved.length > 0;
           if (!dirty) {
             cleanSlots[follower._id] = follower;
@@ -362,7 +767,7 @@ Slot.prototype._propogate = function (_ref) {
           follower.debug && console.info('slot: slot ' + follower._tag + ' will be refreshed');
           var context = { involved: involved, roots: roots };
           var oldV = follower._value;
-
+          // DON'T CALL change callbacks
           if (follower.touch(false, context, false)) {
             changeCbArgs.push([follower, oldV, involved]);
           } else {
@@ -384,6 +789,7 @@ Slot.prototype._propogate = function (_ref) {
         }
       }
     }
+    // call change callbacks at last
   } catch (err) {
     _didIteratorError2 = true;
     _iteratorError2 = err;
@@ -432,6 +838,12 @@ Slot.prototype._propogate = function (_ref) {
   });
 };
 
+/**
+ * get or set the value, if no argument is given, get the current value of Slot,
+ * otherwise, set the value of Slot, *the mutation process* starts, and returns *this*
+ *
+ * @return {(any|Slot)}
+ * */
 Slot.prototype.val = function val() {
   if (arguments.length === 0) {
     if (this._value === void 0 && typeof this._valueFunc === 'function') {
@@ -444,6 +856,11 @@ Slot.prototype.val = function val() {
   return this.setV(arguments.length <= 0 ? undefined : arguments[0]);
 };
 
+/**
+ * set the slot's value, and starts a *mutation process*
+ *
+ * @param {any} newV - the new value of slot,
+ * */
 Slot.prototype.setV = function setV(newV) {
   if (typeof this._mutationTester === 'function' && !this._mutationTester(this._value, newV)) {
     return this;
@@ -521,7 +938,7 @@ Slot.prototype._setupOffsprings = function () {
   if (_isEmptyObj(this._followerMap)) {
     return this;
   }
-
+  // level by level
   for (var _offspringMap = _objectValues(this._followerMap), level = 1; _offspringMap.length; _offspringMap = _colletFollowers(_offspringMap), ++level) {
     var _iteratorNormalCompletion7 = true;
     var _didIteratorError7 = false;
@@ -594,6 +1011,20 @@ Slot.prototype._setupOffsprings = function () {
   return this;
 };
 
+/**
+ * touch a slot, that means, re-evaluate the slot's value forcely, and
+ * starts *mutation process* and call change callbacks if neccessary.
+ * usually, you don't need call this method, only when you need to mutate the
+ * following graph (like override, replaceFollowing, follow)
+ *
+ * @param propogate - if starts a *mutation process*, default is true
+ * @param context - if null, the touched slot is served as roots, default is null
+ * @param callChangeCbs - if call change callbacks, default is true
+ *
+ * @return {boolean} - return true if this Slot is mutated, else false
+ *
+ * @see Slot#override
+ * */
 Slot.prototype.touch = function () {
   var propogate = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
   var context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -642,6 +1073,20 @@ Slot.prototype.touch = function () {
   return true;
 };
 
+/**
+ * make a follower slot of me. this following has only one followings it is me.
+ * @example
+ * const $$s1 = Slot(1);
+ * const $$s2 = $$s1.fork(n => n + 1);
+ *
+ * is equivalent to:
+ *
+ * @example
+ * const $$s1 = Slot(1);
+ * const $$s2 = Slot(([n]) => n + 1, [$$s1]);
+ *
+ * @param {function} func - the evaluation function
+ * */
 Slot.prototype.fork = function (func) {
   return Slot(function (_ref5) {
     var _ref6 = _slicedToArray(_ref5, 1),
@@ -651,7 +1096,22 @@ Slot.prototype.fork = function (func) {
   }, [this]);
 };
 
+/**
+ * unfollow all the followings if any and follow the new followings using the new
+ * valueFunc, this method will mutate the following graph.
+ *
+ * !!NOTE this method will not re-evaluate the slot and starts the mutation process
+ * at once, so remember to call touch at last if you want to start a mutaion process
+ *
+ * @param {function} valueFunc
+ * @param {array} followings - please see Slot's constructor
+ *
+ * @return {Slot} this
+ *
+ * @see {@link Slot}
+ * */
 Slot.prototype.follow = function (valueFunc, followings) {
+  // if connect to the same followings, nothing happens
   var connectTheSameFollowings = true;
   for (var i = 0; i < Math.max(followings.length, this._followings.length); ++i) {
     if (followings[i] != this._followings[i]) {
@@ -663,10 +1123,10 @@ Slot.prototype.follow = function (valueFunc, followings) {
     return this;
   }
   var self = this;
-
+  // make my value invalid
   self._value = void 0;
   self._valueFunc = valueFunc;
-
+  // affected followings slots
   var _iteratorNormalCompletion10 = true;
   var _didIteratorError10 = false;
   var _iteratorError10 = undefined;
@@ -710,6 +1170,7 @@ Slot.prototype.follow = function (valueFunc, followings) {
 
       _loop(following);
     }
+    // setup followings
   } catch (err) {
     _didIteratorError11 = true;
     _iteratorError11 = err;
@@ -732,7 +1193,8 @@ Slot.prototype.follow = function (valueFunc, followings) {
       slot._followerMap[self._id] = self;
     }
   });
-
+  // make ancestors' _offspringMap obsolete, it will be
+  // recalculated until they are evaluated
   self._getAncestors().forEach(function (ancestor) {
     ancestor._offspringLevels = ancestor._offspringMap = void 0;
   });
@@ -797,11 +1259,41 @@ Slot.prototype._getAncestors = function _getAncestors() {
   return _objectValues(ancestors);
 };
 
+/**
+ * shrink to a data slot with value *val*
+ * @return {Slot} this
+ * */
 Slot.prototype.shrink = function (val) {
   this._valueFunc = void 0;
   return this.follow(void 0, []).val(val);
 };
 
+/**
+ * mutate a group of slots by applying functions upon them, and starts a
+ * *mutation proccess* whose roots are these slots to be changed
+ *
+ * NOTE!!! this is not the same as set value for each slot one by one, but
+ * consider them as a whole to find the best mutaion path
+ *
+ * @example
+ * let $$p1 = Slot(1).tag('p1');
+ * let $$p2 = Slot(2).tag('p2');
+ * let $$p3 = $$p2.fork(it => it + 1).tag('p3');
+ * let $$p4 = Slot(function ([p1, p2, p3], { roots, involved }) {
+ *   console.log(roots.map(it => it.tag())); // p1, p2
+ *   console.log(involved.map(it => it.tag())); // p1, p2, p3
+ *   return p1 + p2 + p3;
+ * }, [$$p1, $$p2, $$p3]);
+ * rimple.mutateWith([
+ *   [$$p1, n => n + 1],
+ *   [$$p2, n => n + 2],
+ * ]);
+ * console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11
+ *
+ * @param {array} slotValuePairs - each element is an array, whose first value is
+ * a Slot, and second is the function to be applied
+ *
+ * */
 var mutateWith = function mutateWith(slotFnPairs) {
   return mutate(slotFnPairs.map(function (_ref7) {
     var _ref8 = _slicedToArray(_ref7, 2),
@@ -812,6 +1304,32 @@ var mutateWith = function mutateWith(slotFnPairs) {
   }));
 };
 
+/**
+ * mutate a group of slots, and starts ONE *mutation proccess* whose
+ * roots are these slots to be changed.
+ *
+ * NOTE!!! this is not the same as set value for each slot one by one, but
+ * consider them as a whole to find the best mutaion path
+ *
+ * @example
+ * let $$p1 = Slot(1).tag('p1');
+ * let $$p2 = Slot(2).tag('p2');
+ * let $$p3 = $$p2.fork(it => it + 1).tag('p3');
+ * let $$p4 = Slot(function ([p1, p2, p3], { roots, involved }) {
+ *   console.log(roots.map(it => it.tag())); // p1, p2
+ *   console.log(involved.map(it => it.tag())); // p1, p2, p3
+ *   return p1 + p2 + p3;
+ * }, [$$p1, $$p2, $$p3]);
+ * rimple.mutate([
+ *   [$$p1, 2],
+ *   [$$p2, 4],
+ * ]);
+ * console.log($$p1.val(), $$p2.val(), $$p3.val(), $$p4.val()); // 2, 4, 5, 11
+ *
+ * @param {array} slotValuePairs - each element is an array, whose first value is
+ * a Slot, and second is the new value of slots
+ *
+ * */
 var mutate = function mutate(slotValuePairs) {
   var cleanSlots = {};
   var roots = slotValuePairs.map(function (_ref9) {
@@ -820,7 +1338,7 @@ var mutate = function mutate(slotValuePairs) {
 
     return slot;
   });
-
+  // mutate the targets directly
   slotValuePairs.forEach(function (_ref11) {
     var _ref12 = _slicedToArray(_ref11, 2),
         slot = _ref12[0],
@@ -860,7 +1378,7 @@ var mutate = function mutate(slotValuePairs) {
       }
     }
   });
-
+  // related slots include roots
   var relatedSlots = {};
   var addToRelatedSlots = function addToRelatedSlots(slot, level) {
     if (slot._id in relatedSlots) {
@@ -887,7 +1405,8 @@ var mutate = function mutate(slotValuePairs) {
       addToRelatedSlots(offspring, level);
     });
   });
-
+  // group _offspringMap by level, but omits level 0 (those mutated directly)
+  // since they have been touched
   var slots = void 0;
   var levels = [];
   var currentLevel = 0;
@@ -931,9 +1450,9 @@ var mutate = function mutate(slotValuePairs) {
           }
           follower.debug && console.info('slot: slot ' + follower._tag + ' will be refreshed');
           var context = { involved: involved, roots: roots };
-
+          // DON'T use val(), val will reevaluate this slot
           var oldV = follower._value;
-
+          // DON'T CALL change callbacks
           if (follower.touch(false, context, false)) {
             changeCbArgs.push([follower, oldV, involved]);
           } else {
@@ -955,6 +1474,7 @@ var mutate = function mutate(slotValuePairs) {
         }
       }
     }
+    // call change callbacks at last
   } catch (err) {
     _didIteratorError15 = true;
     _iteratorError15 = err;
@@ -1003,6 +1523,27 @@ var mutate = function mutate(slotValuePairs) {
   });
 };
 
+/**
+ * apply the function to me
+ *
+ * @example
+ * const $$s = Slot(1);
+ * $$s.mutateWith(function (s, n) {
+ *  return s + n;
+ * }, [2]);
+ * console.log($$s.val()); // output 3
+ *
+ * is equivalent to
+ * @example
+ * const $$s = Slot(1);
+ * $$s.val(function (s, n) { return s + n; }($$s.val(), 2));
+ *
+ * @param {function} func - the mutation function
+ * @param {array} args - the extra arguments provided to func, default is []
+ *
+ * @return {Slot} this
+ *
+ * */
 Slot.prototype.mutateWith = function mutateWith(func) {
   var args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
@@ -1010,10 +1551,28 @@ Slot.prototype.mutateWith = function mutateWith(func) {
   return this.val(func.apply(this, args));
 };
 
+/**
+ * add methods to Slot's prototype
+ *
+ * @example
+ * rimple.mixin({
+ *   negate() {
+ *     return this.val(-this.val());
+ *   }
+ * });
+ * const $$s = Slot(1).negate();
+ * console.log($$s.val()); // output -1
+ *
+ * @param {object} mixins - the mixins to be added
+ *
+ * */
 var mixin = function mixin(mixins) {
   Object.assign(Slot.prototype, mixins);
 };
 
+/**
+ * create an immutable slot, which use '===' to test if value is mutated
+ * */
 var immSlot = function immSlot(value) {
   return Slot(value).mutationTester(function (a, b) {
     return a !== b;
