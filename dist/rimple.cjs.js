@@ -603,6 +603,10 @@ Slot.prototype.offChange = function (proc) {
   });
 };
 
+Slot.prototype.clearChangeCbs = function clearChangeCbs() {
+  this._changeCbs = [];
+};
+
 /**
  * detach the target slot from its followings, and let its followers
  * connect me(this), just as if slot has been eliminated after the detachment.

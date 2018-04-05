@@ -242,6 +242,9 @@ Slot.prototype.offChange = function (proc) {
   this._changeCbs = this._changeCbs.filter(cb => cb != proc);
 };
 
+Slot.prototype.clearChangeCbs = function clearChangeCbs() {
+  this._changeCbs = [];
+};
 
 /**
  * detach the target slot from its followings, and let its followers
