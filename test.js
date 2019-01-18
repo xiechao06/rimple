@@ -1,6 +1,6 @@
 const should = require('should');
 require('should-spies');
-const rimple = require('./dist/rimple');
+const rimple = require('./dist/rimple.cjs');
 const { slot, immSlot } = rimple;
 const assert = require('assert');
 const R = require('ramda');

@@ -4,10 +4,6 @@
   "description": "",
   "module": "dist/rimple.es6.js",
   "main": "dist/rimple.cjs.js",
-  "dependencies": {
-    "del": "^3.0.0",
-    "gulp": "^4.0.0"
-  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-minify": "^0.2.0",
@@ -28,10 +24,14 @@
     "should": "^11.2.1",
     "should-spies": "^1.1.0",
     "source-map-support": "^0.4.18",
-    "yargs": "^7.1.0"
+    "yargs": "^7.1.0",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0"
   },
   "scripts": {
-    "test": "./node_modules/gulp/bin/gulp.js test"
+    "test": "gulp test",
+    "build": "gulp build",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
